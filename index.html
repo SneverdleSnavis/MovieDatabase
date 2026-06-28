@@ -364,12 +364,12 @@ canvas{width:100%!important;display:block}
     </div>
     <div class="filter-panel" id="filter-panel">
       <div class="filter-grid">
-        <div class="filter-item filter-select"><label>Film Type</label><div class="ms-sel" data-msid="ftype"><button class="ms-sel-btn" onclick="toggleMsSel('ftype')"><span id="ms-lbl-ftype">All types</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-ftype" onclick="event.stopPropagation()"></div></div></div>
-        <div class="filter-item filter-select"><label>Rating</label><div class="ms-sel" data-msid="frating"><button class="ms-sel-btn" onclick="toggleMsSel('frating')"><span id="ms-lbl-frating">All ratings</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-frating" onclick="event.stopPropagation()"></div></div></div>
-        <div class="filter-item filter-select"><label>Actor Type</label><div class="ms-sel" data-msid="factype"><button class="ms-sel-btn" onclick="toggleMsSel('factype')"><span id="ms-lbl-factype">All actor types</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-factype" onclick="event.stopPropagation()"></div></div></div>
-        <div class="filter-item filter-select"><label>Form</label><div class="ms-sel" data-msid="fform"><button class="ms-sel-btn" onclick="toggleMsSel('fform')"><span id="ms-lbl-fform">All forms</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-fform" onclick="event.stopPropagation()"></div></div></div>
-        <div class="filter-item filter-select"><label>View</label><div class="ms-sel" data-msid="fview"><button class="ms-sel-btn" onclick="toggleMsSel('fview')"><span id="ms-lbl-fview">All views</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-fview" onclick="event.stopPropagation()"></div></div></div>
-        <div class="filter-item filter-select"><label>Blocked</label><div class="ms-sel" data-msid="fblocked"><button class="ms-sel-btn" onclick="toggleMsSel('fblocked')"><span id="ms-lbl-fblocked">Any</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-fblocked" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Film Type</label><div class="ms-sel" data-msid="ftype"><button class="ms-sel-btn" onclick="toggleMsSel(event,'ftype')"><span id="ms-lbl-ftype">All types</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-ftype" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Rating</label><div class="ms-sel" data-msid="frating"><button class="ms-sel-btn" onclick="toggleMsSel(event,'frating')"><span id="ms-lbl-frating">All ratings</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-frating" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Actor Type</label><div class="ms-sel" data-msid="factype"><button class="ms-sel-btn" onclick="toggleMsSel(event,'factype')"><span id="ms-lbl-factype">All actor types</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-factype" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Form</label><div class="ms-sel" data-msid="fform"><button class="ms-sel-btn" onclick="toggleMsSel(event,'fform')"><span id="ms-lbl-fform">All forms</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-fform" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>View</label><div class="ms-sel" data-msid="fview"><button class="ms-sel-btn" onclick="toggleMsSel(event,'fview')"><span id="ms-lbl-fview">All views</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-fview" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Blocked</label><div class="ms-sel" data-msid="fblocked"><button class="ms-sel-btn" onclick="toggleMsSel(event,'fblocked')"><span id="ms-lbl-fblocked">Any</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-fblocked" onclick="event.stopPropagation()"></div></div></div>
         <div class="filter-item"><label>Tag</label><input type="text" id="ftag" class="filter-select" placeholder="e.g. outdoor" style="width:130px"/></div>
         <div class="filter-item"><label>Scene</label><input type="text" id="fscene" class="filter-select" placeholder="scene name" style="width:130px"/></div>
         <div class="filter-item"><label>Actor Name</label><input type="text" id="fname" class="filter-select" placeholder="name" style="width:130px"/></div>
@@ -641,7 +641,8 @@ function esc(s) {
 }
 
 // ── Multi-select dropdowns ──
-function toggleMsSel(id) {
+function toggleMsSel(e, id) {
+  e.stopPropagation();
   const panel = document.getElementById('ms-panel-' + id);
   const isOpen = panel.classList.contains('open');
   document.querySelectorAll('.ms-sel-panel.open').forEach(p => { p.classList.remove('open'); p.closest('.ms-sel').querySelector('.ms-sel-btn').classList.remove('open'); });
