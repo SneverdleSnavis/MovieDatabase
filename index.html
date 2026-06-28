@@ -372,6 +372,7 @@ canvas{width:100%!important;display:block}
       <input type="text" id="actor-qs" class="ctrl-search" placeholder="Search actors…"/>
       <span class="sort-label">Sort</span>
       <select id="actor-sb">
+        <option value="actorscore">Avg actor score</option>
         <option value="count">Film count</option>
         <option value="rating">Avg rating</option>
         <option value="score">Avg film score</option>
@@ -1198,15 +1199,17 @@ function renderActorsPage() {
 
   let actors = _actors.filter(a => !q || a.name.toLowerCase().includes(q));
 
+  const avgAS = a => a.movies.reduce((s,m) => s+m.actorScore, 0) / a.movies.length;
   actors.sort((a, b) => {
-    if (sb === 'count')  return b.movies.length - a.movies.length;
+    if (sb === 'actorscore') return avgAS(b) - avgAS(a);
+    if (sb === 'count')      return b.movies.length - a.movies.length;
     if (sb === 'rating') {
       const ar = a => { const r = a.movies.filter(m => m.rating); return r.length ? r.reduce((s,m) => s+m.rating,0)/r.length : 0; };
       return ar(b) - ar(a);
     }
     if (sb === 'score') {
-      const as = a => a.movies.reduce((s,m) => s+m.filmScore, 0) / a.movies.length;
-      return as(b) - as(a);
+      const fs = a => a.movies.reduce((s,m) => s+m.filmScore, 0) / a.movies.length;
+      return fs(b) - fs(a);
     }
     return a.name.localeCompare(b.name);
   });
@@ -1221,19 +1224,21 @@ function renderActorsPage() {
   empty.style.display = 'none';
 
   grid.innerHTML = actors.map(a => {
-    const ratedMovies = a.movies.filter(m => m.rating > 0);
-    const avgRating   = ratedMovies.length ? ratedMovies.reduce((s,m) => s+m.rating,0) / ratedMovies.length : 0;
-    const avgFS       = normFS(a.movies.reduce((s,m) => s+m.filmScore,0) / a.movies.length);
-    const starsStr    = avgRating ? stars(Math.round(avgRating)) : '';
-    const aKey        = actorImgKey(a.name);
+    const ratedMovies  = a.movies.filter(m => m.rating > 0);
+    const avgRating    = ratedMovies.length ? ratedMovies.reduce((s,m) => s+m.rating,0) / ratedMovies.length : 0;
+    const avgASNorm    = normAS(avgAS(a));
+    const avgFSNorm    = normFS(a.movies.reduce((s,m) => s+m.filmScore,0) / a.movies.length);
+    const starsStr     = avgRating ? stars(Math.round(avgRating)) : '';
+    const aKey         = actorImgKey(a.name);
     return `<div class="actor-card" data-actorname="${esc(a.name)}" onclick="showActorFilms(this.dataset.actorname)">
   <img class="card-img" data-imgkey="${esc(aKey)}" alt="">
   <div style="padding:10px 12px 12px;position:relative">
     <button class="card-cam-btn" style="position:absolute;top:8px;right:8px;opacity:.5" data-imgkey="${esc(aKey)}" onclick="event.stopPropagation();openImgModal(this.dataset.imgkey)" title="Set image">⊕</button>
+    <div style="font-size:26px;font-weight:700;color:#3a4a28;font-family:Georgia,serif;line-height:1">${avgASNorm}<span style="font-size:12px;font-weight:400">%</span></div>
+    <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#aab890;margin-bottom:6px">actor score</div>
     <div class="actor-name">${esc(a.name)}</div>
-    <div class="actor-stat"><b>${a.movies.length}</b> film${a.movies.length !== 1 ? 's' : ''}</div>
+    <div class="actor-stat"><b>${a.movies.length}</b> film${a.movies.length !== 1 ? 's' : ''} · film score <b>${avgFSNorm}%</b></div>
     ${starsStr ? `<div class="actor-stars">${starsStr}</div>` : ''}
-    <div class="actor-stat">Avg score <b>${avgFS}%</b></div>
   </div>
 </div>`;
   }).join('');
