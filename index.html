@@ -230,6 +230,23 @@ canvas{width:100%!important;display:block}
 [data-theme="dark"] .stats-list-count{color:#506040}
 [data-theme="dark"] #page-stats.active,[data-theme="dark"] #page-actors.active{background:rgba(18,22,12,.92)}
 [data-theme="dark"] .scroll-loading{color:#506040}
+
+/* Actor modal (stacks on top of film modal) */
+.actor-modal-backdrop{display:none;position:fixed;inset:0;z-index:300;background:rgba(20,30,12,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px}
+.actor-modal-backdrop.open{display:flex}
+.actor-modal{background:#fff;border:1px solid #d0ddb8;border-radius:16px;max-width:440px;width:100%;box-shadow:0 24px 64px rgba(40,55,25,.28);overflow:hidden;animation:modalIn .18s ease}
+.actor-modal-header{padding:20px 22px 14px}
+.actor-modal-title{font-size:20px;font-weight:600;color:#2a3a18;font-family:Georgia,serif;margin-bottom:2px}
+.actor-modal-sub{font-size:13px;color:#7a8c60;margin-bottom:14px}
+.actor-modal-body{padding:0 22px 22px}
+.actor-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px}
+.actor-modal-close{display:block;width:100%;margin-top:14px;font-size:13px;padding:9px;border:1px solid #c0cfa0;border-radius:8px;background:#f4f7ee;color:#3a4a28;cursor:pointer;font-family:Georgia,serif;transition:background .15s}
+.actor-modal-close:hover{background:#e8eed8}
+[data-theme="dark"] .actor-modal{background:#1d2516;border-color:#2a3620}
+[data-theme="dark"] .actor-modal-title{color:#d8e8b8}
+[data-theme="dark"] .actor-modal-sub{color:#7a9060}
+[data-theme="dark"] .actor-modal-close{background:#232c1a;border-color:#3a4828;color:#bccca0}
+[data-theme="dark"] .actor-modal-close:hover{background:#2a3620}
 </style>
 </head>
 <body>
@@ -282,6 +299,7 @@ canvas{width:100%!important;display:block}
         <div class="filter-item"><label>Min Pacing</label><input type="number" id="fpmin" class="filter-num" placeholder="0" min="0"/></div>
         <div class="filter-item"><label>Max Pacing</label><input type="number" id="fpmax" class="filter-num" placeholder="" min="0"/></div>
         <div class="filter-item"><label>Min Watches</label><input type="number" id="fwmin" class="filter-num" placeholder="0" min="0"/></div>
+        <div class="filter-item"><label>Max Watches</label><input type="number" id="fwmax" class="filter-num" placeholder="" min="0"/></div>
       </div>
     </div>
   </div>
@@ -337,6 +355,16 @@ canvas{width:100%!important;display:block}
   <!-- Stats page -->
   <div class="page-section" id="page-stats">
     <div class="stats-grid" id="stats-grid"></div>
+  </div>
+</div>
+
+<!-- Actor modal (stacks above film modal) -->
+<div class="actor-modal-backdrop" id="actor-modal-backdrop" onclick="closeActorModal(event)">
+  <div class="actor-modal" id="actor-modal">
+    <div id="actor-modal-inner"></div>
+    <div style="padding:0 22px 22px">
+      <button class="actor-modal-close" onclick="closeActorModal()">Close</button>
+    </div>
   </div>
 </div>
 
@@ -522,10 +550,11 @@ function af() {
   const fpmin  = parseInt(document.getElementById('fpmin').value) || 0;
   const fpmax  = parseInt(document.getElementById('fpmax').value) || 0;
   const fwmin  = parseInt(document.getElementById('fwmin').value) || 0;
+  const fwmax  = parseInt(document.getElementById('fwmax').value) || 0;
   const sb     = document.getElementById('sb').value;
   const sd     = document.getElementById('sd').value;
 
-  const hasFilters = ftype||frating||factype||fform||fview||fblocked||ftag||fscene||fname||fpmin||fpmax||fwmin;
+  const hasFilters = ftype||frating||factype||fform||fview||fblocked||ftag||fscene||fname||fpmin||fpmax||fwmin||fwmax;
   document.getElementById('filter-btn').classList.toggle('has-filters', !!hasFilters);
   document.getElementById('reset-btn').classList.toggle('active', !!(hasFilters || q));
 
@@ -543,6 +572,7 @@ function af() {
     if (fpmin  && m.pacing < fpmin) return false;
     if (fpmax  && m.pacing > fpmax) return false;
     if (fwmin  && m.watch  < fwmin) return false;
+    if (fwmax  && m.watch  > fwmax) return false;
     return true;
   });
 
@@ -657,7 +687,7 @@ function updateStats() {
     `<div class="stat"><b>${avgFS.toLocaleString()}</b> Avg Film Score</div>`;
 }
 
-// ── Modal ──
+// ── Film Modal ──
 function openModal(idx) {
   _modalIdx = idx;
   const m = fil[idx];
@@ -665,10 +695,40 @@ function openModal(idx) {
   const rc     = rClass(m.rating);
   const sc     = starsColor(rc);
   const fsNorm = normFS(m.filmScore);
-  const asNorm = normAS(m.actorScore);
 
-  const tagsHtml  = m.tags.map(t  => `<span class="modal-pill">${esc(t)}</span>`).join('');
   const scenesHtml = m.scenes.map(s => `<span class="modal-pill" style="background:#eef0f8;border-color:#c8ccdc;color:#6a7a9a">${esc(s)}</span>`).join('');
+
+  // Film Features: View, Blocked, Pacing, Tags
+  const hasFeatures = m.view || m.blocked || m.pacing || m.tags.length;
+  const tagsHtml = m.tags.map(t => `<span class="modal-pill">${esc(t)}</span>`).join('');
+  const featuresSection = hasFeatures ? `
+    <div class="modal-section-head">Film Features</div>
+    ${m.view    ? `<div><div class="modal-label">View</div><div class="modal-value">${esc(m.view)}</div></div>` : ''}
+    ${m.blocked ? `<div><div class="modal-label">Blocked</div><div class="modal-value">${esc(m.blocked)}</div></div>` : ''}
+    ${m.pacing  ? `<div><div class="modal-label">Pacing</div><div class="modal-value">${m.pacing}</div></div>` : ''}
+    ${tagsHtml  ? `<div class="modal-full" style="margin-top:2px">${tagsHtml}</div>` : ''}` : '';
+
+  // Actor Info: Actor Score, Name, Type, Front, Back, Overall, Face, Form
+  const hasActor = m.actorScore || m.name || m.actorType || m.front || m.back || m.overall || m.face || m.form;
+  const asNorm = normAS(m.actorScore);
+  const actorSection = hasActor ? `
+    <div class="modal-section-head" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Actor Info</span>
+      <button onclick="openActorModal(${idx})" style="font-size:11px;padding:2px 10px;border:1px solid #c0cfa0;border-radius:6px;background:#f4f7ee;color:#3a4a28;cursor:pointer;font-family:Georgia,serif;transition:background .15s" onmouseover="this.style.background='#e8eed8'" onmouseout="this.style.background='#f4f7ee'">Actor details →</button>
+    </div>
+    <div>
+      <div class="modal-label">Actor Score</div>
+      <div class="modal-value" style="font-size:18px;font-weight:700">${m.actorScore.toLocaleString()}</div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:${asNorm}%"></div></div>
+      <div style="font-size:10px;color:#9aae80;margin-top:2px">${asNorm}% of max</div>
+    </div>
+    ${m.name     ? `<div><div class="modal-label">Name</div><div class="modal-value">${esc(m.name)}</div></div>` : ''}
+    ${m.actorType? `<div><div class="modal-label">Type</div><div class="modal-value">${esc(m.actorType)}</div></div>` : ''}
+    ${m.front    ? `<div><div class="modal-label">Front</div><div class="modal-value">${m.front}</div></div>` : ''}
+    ${m.back     ? `<div><div class="modal-label">Back</div><div class="modal-value">${m.back}</div></div>` : ''}
+    ${m.overall  ? `<div><div class="modal-label">Overall</div><div class="modal-value">${m.overall}</div></div>` : ''}
+    ${m.face     ? `<div><div class="modal-label">Face</div><div class="modal-value">${m.face}</div></div>` : ''}
+    ${m.form     ? `<div><div class="modal-label">Form</div><div class="modal-value">${esc(m.form)}</div></div>` : ''}` : '';
 
   document.getElementById('modal-inner').innerHTML = `
 <div class="modal-score-header ${rc}">
@@ -682,37 +742,25 @@ function openModal(idx) {
       ${m.type ? `<div style="margin-top:4px"><span class="modal-pill">${esc(m.type)}</span></div>` : ''}
     </div>
   </div>
-  ${m.name ? `<div class="modal-name">${esc(m.name)}${m.actorType ? ` · ${esc(m.actorType)}` : ''}</div>` : ''}
-  ${tagsHtml||scenesHtml ? `<div class="modal-pills">${tagsHtml}${scenesHtml}</div>` : ''}
+  ${scenesHtml ? `<div class="modal-pills" style="margin-top:10px">${scenesHtml}</div>` : ''}
 </div>
 <div class="modal-body">
   ${m.titleUrl ? `<a class="modal-link-btn" href="${esc(m.titleUrl)}" target="_blank" rel="noopener">↗ Open link</a>` : ''}
-  <div class="modal-grid" style="margin-top:${m.titleUrl?'14px':'0'}">
+  <div class="modal-grid" style="margin-top:${m.titleUrl ? '14px' : '0'}">
     <div>
       <div class="modal-label">Film Score</div>
       <div class="modal-value" style="font-size:20px;font-weight:700">${m.filmScore.toLocaleString()}</div>
       <div class="score-bar-wrap"><div class="score-bar" style="width:${fsNorm}%"></div></div>
       <div style="font-size:10px;color:#9aae80;margin-top:2px">${fsNorm}% of max</div>
     </div>
-    <div>
-      <div class="modal-label">Actor Score</div>
-      <div class="modal-value" style="font-size:20px;font-weight:700">${m.actorScore.toLocaleString()}</div>
-      <div class="score-bar-wrap"><div class="score-bar" style="width:${asNorm}%"></div></div>
-      <div style="font-size:10px;color:#9aae80;margin-top:2px">${asNorm}% of max</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${m.length   ? `<div><div class="modal-label">Length</div><div class="modal-value">${m.length} min</div></div>` : ''}
+      ${m.watch!=null ? `<div><div class="modal-label">Watches</div><div class="modal-value">${m.watch||0}</div></div>` : ''}
+      ${m.date     ? `<div><div class="modal-label">Date</div><div class="modal-value">${esc(m.date)}</div></div>` : ''}
+      ${m.location ? `<div><div class="modal-label">Location</div><div class="modal-value">${esc(m.location)}</div></div>` : ''}
     </div>
-    ${m.length  ? `<div><div class="modal-label">Length</div><div class="modal-value">${m.length} min</div></div>` : ''}
-    ${m.watch!=null?`<div><div class="modal-label">Watches</div><div class="modal-value">${m.watch||0}</div></div>`:''}
-    ${m.date    ? `<div><div class="modal-label">Date</div><div class="modal-value">${esc(m.date)}</div></div>` : ''}
-    ${m.location? `<div><div class="modal-label">Location</div><div class="modal-value">${esc(m.location)}</div></div>` : ''}
-    ${(m.front||m.back||m.overall||m.face||m.pacing) ? '<div class="modal-section-head">Actor Details</div>' : ''}
-    ${m.front   ? `<div><div class="modal-label">Front</div><div class="modal-value">${m.front}</div></div>` : ''}
-    ${m.back    ? `<div><div class="modal-label">Back</div><div class="modal-value">${m.back}</div></div>` : ''}
-    ${m.overall ? `<div><div class="modal-label">Overall</div><div class="modal-value">${m.overall}</div></div>` : ''}
-    ${m.face    ? `<div><div class="modal-label">Face</div><div class="modal-value">${m.face}</div></div>` : ''}
-    ${m.pacing  ? `<div><div class="modal-label">Pacing</div><div class="modal-value">${m.pacing}</div></div>` : ''}
-    ${m.form    ? `<div><div class="modal-label">Form</div><div class="modal-value">${esc(m.form)}</div></div>` : ''}
-    ${m.view    ? `<div><div class="modal-label">View</div><div class="modal-value">${esc(m.view)}</div></div>` : ''}
-    ${m.blocked ? `<div><div class="modal-label">Blocked</div><div class="modal-value">${esc(m.blocked)}</div></div>` : ''}
+    ${featuresSection}
+    ${actorSection}
   </div>
 </div>`;
 
@@ -727,7 +775,48 @@ function closeModal(e) {
   _modalIdx = -1;
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+// ── Actor Modal ──
+function openActorModal(idx) {
+  const m = fil[idx];
+  if (!m) return;
+  const asNorm = normAS(m.actorScore);
+  const rc     = rClass(m.rating);
+
+  document.getElementById('actor-modal-inner').innerHTML = `
+<div class="actor-modal-header ${rc}">
+  <div class="actor-modal-title">${esc(m.name || 'Actor')}</div>
+  ${m.actorType ? `<div class="actor-modal-sub">${esc(m.actorType)}</div>` : ''}
+</div>
+<div class="actor-modal-body">
+  <div style="margin-bottom:14px">
+    <div class="modal-label">Actor Score</div>
+    <div class="modal-value" style="font-size:22px;font-weight:700">${m.actorScore.toLocaleString()}</div>
+    <div class="score-bar-wrap"><div class="score-bar" style="width:${asNorm}%"></div></div>
+    <div style="font-size:10px;color:#9aae80;margin-top:2px">${asNorm}% of max</div>
+  </div>
+  <div class="actor-modal-grid">
+    ${m.front   ? `<div><div class="modal-label">Front</div><div class="modal-value">${m.front}</div></div>` : ''}
+    ${m.back    ? `<div><div class="modal-label">Back</div><div class="modal-value">${m.back}</div></div>` : ''}
+    ${m.overall ? `<div><div class="modal-label">Overall</div><div class="modal-value">${m.overall}</div></div>` : ''}
+    ${m.face    ? `<div><div class="modal-label">Face</div><div class="modal-value">${m.face}</div></div>` : ''}
+    ${m.form    ? `<div class="modal-full"><div class="modal-label">Form</div><div class="modal-value">${esc(m.form)}</div></div>` : ''}
+  </div>
+</div>`;
+
+  document.getElementById('actor-modal-backdrop').classList.add('open');
+}
+
+function closeActorModal(e) {
+  if (e && e.target !== document.getElementById('actor-modal-backdrop')) return;
+  document.getElementById('actor-modal-backdrop').classList.remove('open');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('actor-modal-backdrop').classList.contains('open')) closeActorModal();
+    else closeModal();
+  }
+});
 
 // ── Filter panel toggle ──
 function toggleFilterPanel() {
@@ -737,7 +826,7 @@ function toggleFilterPanel() {
 }
 
 function resetFilters() {
-  ['qs','ftag','fscene','fname','fpmin','fpmax','fwmin'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['qs','ftag','fscene','fname','fpmin','fpmax','fwmin','fwmax'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
   ['ftype','frating','factype','fform','fview','fblocked'].forEach(id => { const el=document.getElementById(id); if(el) el.selectedIndex=0; });
   af();
 }
@@ -921,8 +1010,8 @@ function renderStatsPage() {
 }
 
 // ── URL state ──
-const URL_KEYS = ['q','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','sb','sd'];
-const ELEM_IDS = ['qs','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','sb','sd'];
+const URL_KEYS = ['q','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','fwmax','sb','sd'];
+const ELEM_IDS = ['qs','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','fwmax','sb','sd'];
 
 function saveURLState() {
   const p = new URLSearchParams();
@@ -936,7 +1025,7 @@ function loadURLState() {
 }
 
 // ── Wire inputs ──
-[...ELEM_IDS,'sb','sd'].forEach(id => {
+ELEM_IDS.forEach(id => {
   const el = document.getElementById(id);
   if (el) { el.addEventListener('input', af); el.addEventListener('change', af); }
 });
