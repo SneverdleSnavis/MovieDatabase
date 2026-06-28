@@ -161,6 +161,7 @@ canvas{width:100%!important;display:block}
 .card-cam-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.5);font-size:12px;cursor:pointer;backdrop-filter:blur(2px);transition:background .15s,opacity .15s;opacity:0;line-height:1;flex-shrink:0}
 .card:hover .card-cam-btn{opacity:1}
 .card-cam-btn.has-img{opacity:.65;background:rgba(138,158,96,.4);border-color:rgba(138,158,96,.6)}
+.actor-card:hover .card-cam-btn{opacity:1}
 .card:hover .card-cam-btn.has-img{opacity:1}
 
 /* Image upload modal */
@@ -788,6 +789,7 @@ const _IMG_DB = 'movdb-images', _IMG_STORE = 'images';
 let _idb = null;
 
 function imgKey(m) { return m.code || m.title; }
+function actorImgKey(name) { return 'actor:' + name; }
 
 async function _openIdb() {
   if (_idb) return _idb;
@@ -906,6 +908,7 @@ async function saveImgAsWebp() {
     if (!_imgCache) _imgCache = {};
     _imgCache[_currentImgKey] = dataUrl;
     applyStoredImages();
+    refreshModalImage(_currentImgKey, dataUrl);
     document.getElementById('img-cur-el').src = dataUrl;
     document.getElementById('img-cur-section').style.display = 'block';
     _imgStatus('Saved' + (fmt === 'image/webp' ? ' as WebP' : ' as JPEG') + '  (' + Math.round(dataUrl.length * 0.75 / 1024) + ' KB)');
@@ -925,7 +928,29 @@ async function removeStoredImage() {
     if (btn) btn.classList.remove('has-img');
   });
   document.getElementById('img-cur-section').style.display = 'none';
+  refreshModalImage(_currentImgKey, null);
   _imgStatus('Image removed.');
+}
+
+function refreshModalImage(key, dataUrl) {
+  // Update the film modal image if it's currently open for this key
+  const backdrop = document.getElementById('modal-backdrop');
+  if (!backdrop.classList.contains('open')) return;
+  const existing = document.getElementById('modal-inner').querySelector('img[data-modalimg]');
+  if (dataUrl) {
+    if (existing) { existing.src = dataUrl; }
+    else {
+      // Insert image block after the score header
+      const header = document.getElementById('modal-inner').querySelector('.modal-score-header');
+      if (header) {
+        const wrap = document.createElement('div');
+        wrap.innerHTML = `<img data-modalimg="1" src="${dataUrl}" style="width:100%;max-height:260px;object-fit:cover;display:block">`;
+        header.insertAdjacentElement('afterend', wrap.firstElementChild);
+      }
+    }
+  } else {
+    if (existing) existing.remove();
+  }
 }
 
 // ── Shared chip helper ──
@@ -976,6 +1001,9 @@ function openModal(idx) {
     chip('Form', m.form),
   ].join('');
 
+  const mKey     = imgKey(m);
+  const storedImg = _imgCache ? _imgCache[mKey] : null;
+
   document.getElementById('modal-inner').innerHTML = `
 <div class="modal-score-header ${rc}" style="padding:14px 16px 12px">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
@@ -986,9 +1014,11 @@ function openModal(idx) {
     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
       ${m.rating ? `<span style="color:${sc};font-size:14px;letter-spacing:1px">${stars(m.rating)}</span>` : ''}
       ${m.titleUrl ? `<a class="card-link-btn" href="${esc(m.titleUrl)}" target="_blank" rel="noopener" title="Open link">↗</a>` : ''}
+      <button class="card-cam-btn" style="opacity:1" data-imgkey="${esc(mKey)}" onclick="event.stopPropagation();openImgModal(this.dataset.imgkey)" title="Edit image">⊕</button>
     </div>
   </div>
 </div>
+${storedImg ? `<img data-modalimg="1" src="${storedImg}" style="width:100%;max-height:260px;object-fit:cover;display:block">` : ''}
 <div style="padding:12px 16px 4px">
   <div class="ms-row">
     <div class="ms-lbl">Film Score</div>
@@ -1195,13 +1225,19 @@ function renderActorsPage() {
     const avgRating   = ratedMovies.length ? ratedMovies.reduce((s,m) => s+m.rating,0) / ratedMovies.length : 0;
     const avgFS       = normFS(a.movies.reduce((s,m) => s+m.filmScore,0) / a.movies.length);
     const starsStr    = avgRating ? stars(Math.round(avgRating)) : '';
-    return `<div class="actor-card" onclick="showActorFilms(${JSON.stringify(esc(a.name))})">
-  <div class="actor-name">${esc(a.name)}</div>
-  <div class="actor-stat"><b>${a.movies.length}</b> film${a.movies.length !== 1 ? 's' : ''}</div>
-  ${starsStr ? `<div class="actor-stars">${starsStr}</div>` : ''}
-  <div class="actor-stat">Avg score <b>${avgFS}%</b></div>
+    const aKey        = actorImgKey(a.name);
+    return `<div class="actor-card" data-actorname="${esc(a.name)}" onclick="showActorFilms(this.dataset.actorname)">
+  <img class="card-img" data-imgkey="${esc(aKey)}" alt="">
+  <div style="padding:10px 12px 12px;position:relative">
+    <button class="card-cam-btn" style="position:absolute;top:8px;right:8px;opacity:.5" data-imgkey="${esc(aKey)}" onclick="event.stopPropagation();openImgModal(this.dataset.imgkey)" title="Set image">⊕</button>
+    <div class="actor-name">${esc(a.name)}</div>
+    <div class="actor-stat"><b>${a.movies.length}</b> film${a.movies.length !== 1 ? 's' : ''}</div>
+    ${starsStr ? `<div class="actor-stars">${starsStr}</div>` : ''}
+    <div class="actor-stat">Avg score <b>${avgFS}%</b></div>
+  </div>
 </div>`;
   }).join('');
+  applyStoredImages();
 }
 
 function showActorFilms(name) {
