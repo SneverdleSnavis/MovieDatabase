@@ -24,12 +24,13 @@ header{position:sticky;top:0;z-index:100;background:rgba(245,242,236,.92);border
 .ctrl-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 0}
 .ctrl-search{flex:1;min-width:200px;font-size:13px;padding:0 10px;height:36px;border:1px solid #c0cfa0;border-radius:8px;background:#fafaf6;color:#3a4a28;outline:none;font-family:Georgia,serif;transition:border-color .15s}
 .ctrl-search:focus{border-color:#8a9e60;box-shadow:0 0 0 3px rgba(120,150,80,.12)}
+.ctrl-search::placeholder{color:#aab890;font-style:italic}
 .sort-label{font-size:12px;color:#7a8c60;font-weight:500;white-space:nowrap;font-style:italic}
 .filter-toggle-btn{font-size:12px;padding:0 14px;height:34px;border:1px solid #c0cfa0;border-radius:8px;background:rgba(250,250,246,.85);color:#3a4a28;cursor:pointer;font-family:Georgia,serif;transition:border-color .15s,background .15s;white-space:nowrap}
 .filter-toggle-btn:hover,.filter-toggle-btn.open{background:#fff;border-color:#8a9e60}
 .filter-toggle-btn.open{color:#4a6a28;font-weight:600}
-.filter-toggle-btn.has-filters{border-color:#8a9e60;background:#f0f5e8;color:#3a4a28}
-.reset-btn{font-size:11px;padding:0 12px;height:28px;border:1px solid #c0cfa0;border-radius:8px;background:rgba(250,250,246,.85);color:#9aae80;cursor:pointer;font-family:Georgia,serif;transition:border-color .15s,background .15s,color .15s;white-space:nowrap;opacity:.6}
+.filter-toggle-btn.has-filters{border-color:#8a9e60;background:#f0f5e8}
+.reset-btn{font-size:11px;padding:0 12px;height:28px;border:1px solid #c0cfa0;border-radius:8px;background:rgba(250,250,246,.85);color:#9aae80;cursor:pointer;font-family:Georgia,serif;transition:all .15s;white-space:nowrap;opacity:.6}
 .reset-btn.active{opacity:1;color:#5a7a30;border-color:#8a9e60}
 .reset-btn:hover{background:#fff;border-color:#8a9e60;opacity:1}
 .filter-panel{display:none;padding:12px 0 4px;border-top:1px solid #d8e4c0}
@@ -46,10 +47,10 @@ header{position:sticky;top:0;z-index:100;background:rgba(245,242,236,.92);border
 .ctrl-bar select:hover{border-color:#8a9e60}
 
 /* Main */
-#main{position:relative;z-index:2;padding:20px 28px 40px;min-height:calc(100vh - 160px)}
+#main{position:relative;z-index:2;padding:20px 28px 60px;min-height:calc(100vh - 160px)}
 .page-section{display:none}
 .page-section.active{display:block;position:relative;z-index:2}
-#page-stats.active{background:rgba(245,242,236,.92);min-height:calc(100vh - 130px)}
+#page-stats.active,#page-actors.active{background:rgba(245,242,236,.92);min-height:calc(100vh - 130px)}
 
 /* Top row */
 .top-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px}
@@ -71,22 +72,25 @@ header{position:sticky;top:0;z-index:100;background:rgba(245,242,236,.92);border
 .graph-box .chart-wrap{position:relative;height:220px}
 canvas{width:100%!important;display:block}
 
-/* Grid */
+/* Card grid */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .card{background:#fff;border:1px solid #e0e8d0;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(60,80,40,.10);transition:border-color .15s,box-shadow .15s,transform .15s;display:flex;flex-direction:column;cursor:pointer}
 .card:hover{border-color:#b0c890;box-shadow:0 6px 24px rgba(60,80,40,.16);transform:translateY(-2px)}
 
 /* Card score header */
-.card-score-header{padding:14px 14px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-height:64px}
+.card-score-header{padding:14px 14px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-height:64px;position:relative}
 .card-film-score{font-size:22px;font-weight:700;font-family:Georgia,serif;line-height:1}
 .card-film-score-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;margin-top:2px;opacity:.7}
-.card-rating-stars{font-size:14px;line-height:1;letter-spacing:1px;flex-shrink:0}
 .card-type-pill{font-size:10px;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.5);white-space:nowrap;font-weight:600;backdrop-filter:blur(2px)}
+
+/* External link button on card */
+.card-link-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.6);font-size:11px;text-decoration:none;color:inherit;backdrop-filter:blur(2px);transition:background .15s;flex-shrink:0;line-height:1}
+.card-link-btn:hover{background:rgba(255,255,255,.9)}
 
 /* Card body */
 .card-body{padding:10px 13px 0;background:#fff;display:flex;flex-direction:column;flex:1}
 .card-title{font-size:13px;font-weight:600;color:#2a3a18;line-height:1.35;font-family:Georgia,serif;margin-bottom:3px}
-.card-meta{font-size:11px;color:#7a8c60;margin-bottom:6px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.card-meta{font-size:11px;color:#7a8c60;margin-bottom:4px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
 .card-meta-sep{color:#c0cfa0}
 .card-pills{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
 .pill{font-size:10px;padding:2px 7px;border-radius:20px;background:#f4f7ee;color:#7a8c60;border:1px solid #dde8c8}
@@ -94,18 +98,12 @@ canvas{width:100%!important;display:block}
 .card-footer{margin-top:auto;padding:7px 0 11px;border-top:1px solid #edf0e8;font-size:10px;color:#aab890;line-height:1.4;font-style:italic}
 
 /* Rating color system (1-5) */
-.r1{background:linear-gradient(135deg,#f5eae8,#ecd8d4)}
-.r1 .card-film-score{color:#7a3028}
-.r2{background:linear-gradient(135deg,#f5f0e2,#ecdcb8)}
-.r2 .card-film-score{color:#7a5a10}
-.r3{background:linear-gradient(135deg,#eef4e2,#d8e8c0)}
-.r3 .card-film-score{color:#3a6020}
-.r4{background:linear-gradient(135deg,#e2f0ee,#b8dcd4)}
-.r4 .card-film-score{color:#1a5a50}
-.r5{background:linear-gradient(135deg,#e8f0fc,#c8d8f8)}
-.r5 .card-film-score{color:#1a3a7a}
-.r0{background:linear-gradient(135deg,#eeecea,#e0dcd8)}
-.r0 .card-film-score{color:#5a5650}
+.r1{background:linear-gradient(135deg,#f5eae8,#ecd8d4)}.r1 .card-film-score{color:#7a3028}
+.r2{background:linear-gradient(135deg,#f5f0e2,#ecdcb8)}.r2 .card-film-score{color:#7a5a10}
+.r3{background:linear-gradient(135deg,#eef4e2,#d8e8c0)}.r3 .card-film-score{color:#3a6020}
+.r4{background:linear-gradient(135deg,#e2f0ee,#b8dcd4)}.r4 .card-film-score{color:#1a5a50}
+.r5{background:linear-gradient(135deg,#e8f0fc,#c8d8f8)}.r5 .card-film-score{color:#1a3a7a}
+.r0{background:linear-gradient(135deg,#eeecea,#e0dcd8)}.r0 .card-film-score{color:#5a5650}
 
 /* Modal */
 .modal-backdrop{display:none;position:fixed;inset:0;z-index:200;background:rgba(40,55,25,.45);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:24px}
@@ -119,17 +117,27 @@ canvas{width:100%!important;display:block}
 .modal-pill{font-size:11px;padding:3px 9px;border-radius:20px;background:#f4f7ee;color:#7a8c60;border:1px solid #dde8c8}
 .modal-body{padding:0 24px 24px}
 .modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;margin-bottom:16px}
-.modal-section{margin-bottom:0}
 .modal-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#aab890;font-weight:600;margin-bottom:3px}
 .modal-value{font-size:14px;color:#3a4a28;line-height:1.5}
 .modal-full{grid-column:1/-1}
-.modal-divider{grid-column:1/-1;border:none;border-top:1px solid #e8f0d8;margin:8px 0}
 .modal-section-head{grid-column:1/-1;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#7a8c60;font-weight:600;padding-top:6px;border-top:1px solid #e8f0d8;margin-top:4px}
-.modal-close{display:block;width:100%;margin-top:18px;font-size:13px;padding:10px;border:1px solid #c0cfa0;border-radius:9px;background:#f4f7ee;color:#3a4a28;cursor:pointer;font-family:Georgia,serif;transition:background .15s}
+.modal-link-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:8px 16px;border:1px solid #c0cfa0;border-radius:8px;background:#f4f7ee;color:#3a4a28;text-decoration:none;font-family:Georgia,serif;transition:background .15s;margin-top:4px}
+.modal-link-btn:hover{background:#e8eed8;border-color:#8a9e60}
+.modal-close{display:block;width:100%;margin-top:14px;font-size:13px;padding:10px;border:1px solid #c0cfa0;border-radius:9px;background:#f4f7ee;color:#3a4a28;cursor:pointer;font-family:Georgia,serif;transition:background .15s}
 .modal-close:hover{background:#e8eed8}
 .score-bar-wrap{height:6px;background:#e8f0d8;border-radius:3px;margin-top:6px;overflow:hidden}
 .score-bar{height:100%;border-radius:3px;background:#8a9e60;transition:width .4s ease}
 .rating-stars-lg{font-size:20px;letter-spacing:2px}
+
+/* Actors page */
+.actors-bar{padding:16px 28px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid #e8f0d8}
+.actor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;padding:20px 28px}
+.actor-card{background:#fff;border:1px solid #e0e8d0;border-radius:12px;padding:14px 16px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s}
+.actor-card:hover{border-color:#b0c890;box-shadow:0 4px 16px rgba(60,80,40,.14);transform:translateY(-2px)}
+.actor-name{font-size:14px;font-weight:600;color:#2a3a18;font-family:Georgia,serif;margin-bottom:6px;line-height:1.3}
+.actor-stat{font-size:11px;color:#7a8c60;line-height:1.7}
+.actor-stat b{color:#3a4a28;font-weight:600}
+.actor-stars{font-size:13px;color:#8a9e60;letter-spacing:1px}
 
 /* Stats page */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px;padding:20px 28px}
@@ -139,20 +147,13 @@ canvas{width:100%!important;display:block}
 .stats-list-name{flex:1;color:#3a4a28;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stats-list-bar-wrap{width:120px;height:6px;background:#f0f4e8;border-radius:3px;flex-shrink:0}
 .stats-list-bar{height:100%;background:#8a9e60;border-radius:3px}
-.stats-list-count{width:28px;text-align:right;font-size:11px;color:#9aae80;flex-shrink:0}
+.stats-list-count{width:36px;text-align:right;font-size:11px;color:#9aae80;flex-shrink:0}
 
-/* Empty */
+/* Empty / loader / sentinel */
 .empty{padding:3rem;text-align:center;color:#9aae80;font-size:15px;display:none;font-style:italic}
-
-/* Loader */
 #loader{position:relative;z-index:10;padding:4rem 2rem;text-align:center;color:#7a8c60;font-size:15px;font-style:italic;font-family:Georgia,serif}
-
-/* Pagination */
-.pagination{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:24px;padding-bottom:8px}
-.page-btn{font-size:12px;padding:6px 14px;border:1px solid #c0cfa0;border-radius:8px;background:rgba(250,250,246,.85);color:#3a4a28;cursor:pointer;font-family:Georgia,serif;transition:background .15s}
-.page-btn:hover:not(:disabled){background:#fff;border-color:#8a9e60}
-.page-btn:disabled{opacity:.4;cursor:default}
-.page-btn.active{background:#8a9e60;border-color:#8a9e60;color:#fff}
+#scroll-sentinel{height:1px;margin-top:24px}
+.scroll-loading{text-align:center;padding:20px;color:#9aae80;font-size:13px;font-style:italic;display:none}
 
 /* ── Dark mode ── */
 [data-theme="dark"]{color-scheme:dark}
@@ -196,18 +197,14 @@ canvas{width:100%!important;display:block}
 [data-theme="dark"] .pill{background:#232c1a;color:#7a9060;border-color:#2a3620}
 [data-theme="dark"] .pill-scene{background:#1e2030;color:#7080a0;border-color:#2a2c40}
 [data-theme="dark"] .card-footer{border-top-color:#2a3620;color:#506040}
-[data-theme="dark"] .r1{background:linear-gradient(135deg,#2a1a18,#3a1e18)}
-[data-theme="dark"] .r2{background:linear-gradient(135deg,#2a2210,#3a2c10)}
-[data-theme="dark"] .r3{background:linear-gradient(135deg,#1a2610,#1e3010)}
-[data-theme="dark"] .r4{background:linear-gradient(135deg,#102622,#10302c)}
-[data-theme="dark"] .r5{background:linear-gradient(135deg,#101a2e,#121e3e)}
-[data-theme="dark"] .r0{background:linear-gradient(135deg,#1e1e1c,#222220)}
-[data-theme="dark"] .r1 .card-film-score{color:#e08070}
-[data-theme="dark"] .r2 .card-film-score{color:#e0b060}
-[data-theme="dark"] .r3 .card-film-score{color:#80c060}
-[data-theme="dark"] .r4 .card-film-score{color:#50c0b0}
-[data-theme="dark"] .r5 .card-film-score{color:#7090e0}
-[data-theme="dark"] .r0 .card-film-score{color:#a0a098}
+[data-theme="dark"] .card-link-btn{background:rgba(0,0,0,.3);border-color:rgba(255,255,255,.15)}
+[data-theme="dark"] .card-link-btn:hover{background:rgba(0,0,0,.6)}
+[data-theme="dark"] .r1{background:linear-gradient(135deg,#2a1a18,#3a1e18)}[data-theme="dark"] .r1 .card-film-score{color:#e08070}
+[data-theme="dark"] .r2{background:linear-gradient(135deg,#2a2210,#3a2c10)}[data-theme="dark"] .r2 .card-film-score{color:#e0b060}
+[data-theme="dark"] .r3{background:linear-gradient(135deg,#1a2610,#1e3010)}[data-theme="dark"] .r3 .card-film-score{color:#80c060}
+[data-theme="dark"] .r4{background:linear-gradient(135deg,#102622,#10302c)}[data-theme="dark"] .r4 .card-film-score{color:#50c0b0}
+[data-theme="dark"] .r5{background:linear-gradient(135deg,#101a2e,#121e3e)}[data-theme="dark"] .r5 .card-film-score{color:#7090e0}
+[data-theme="dark"] .r0{background:linear-gradient(135deg,#1e1e1c,#222220)}[data-theme="dark"] .r0 .card-film-score{color:#a0a098}
 [data-theme="dark"] .card-type-pill{background:rgba(0,0,0,.3);border-color:rgba(255,255,255,.12)}
 [data-theme="dark"] .modal{background:#1d2516;border-color:#2a3620}
 [data-theme="dark"] .modal-title{color:#d8e8b8}
@@ -216,17 +213,23 @@ canvas{width:100%!important;display:block}
 [data-theme="dark"] .modal-label{color:#506040}
 [data-theme="dark"] .modal-value{color:#bccca0}
 [data-theme="dark"] .modal-section-head{color:#7a9060;border-top-color:#2a3620}
-[data-theme="dark"] .modal-divider{border-top-color:#2a3620}
+[data-theme="dark"] .modal-link-btn{background:#232c1a;border-color:#3a4828;color:#bccca0}
+[data-theme="dark"] .modal-link-btn:hover{background:#2a3620;border-color:#9ab070}
 [data-theme="dark"] .score-bar-wrap{background:#2a3620}
 [data-theme="dark"] .modal-close{background:#232c1a;border-color:#3a4828;color:#bccca0}
 [data-theme="dark"] .modal-close:hover{background:#2a3620}
+[data-theme="dark"] .actors-bar{border-bottom-color:#2a3620}
+[data-theme="dark"] .actor-card{background:#1d2516;border-color:#2a3620}
+[data-theme="dark"] .actor-card:hover{border-color:#7a9050;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+[data-theme="dark"] .actor-name{color:#d8e8b8}
+[data-theme="dark"] .actor-stat{color:#7a9060}
+[data-theme="dark"] .actor-stat b{color:#bccca0}
+[data-theme="dark"] .actor-stars{color:#9ab070}
 [data-theme="dark"] .stats-list-name{color:#bccca0}
 [data-theme="dark"] .stats-list-bar-wrap{background:#232c1a}
 [data-theme="dark"] .stats-list-count{color:#506040}
-[data-theme="dark"] .page-btn{background:rgba(25,30,17,.85);border-color:#3a4828;color:#bccca0}
-[data-theme="dark"] .page-btn:hover:not(:disabled){background:#1d2516;border-color:#9ab070}
-[data-theme="dark"] .page-btn.active{background:#9ab070;border-color:#9ab070;color:#fff}
-[data-theme="dark"] #page-stats.active{background:rgba(18,22,12,.92)}
+[data-theme="dark"] #page-stats.active,[data-theme="dark"] #page-actors.active{background:rgba(18,22,12,.92)}
+[data-theme="dark"] .scroll-loading{color:#506040}
 </style>
 </head>
 <body>
@@ -238,49 +241,61 @@ canvas{width:100%!important;display:block}
     <div class="header-title">Movie Collection<span>a personal archive</span></div>
     <nav class="top-nav">
       <button class="nav-btn active" id="nav-list" onclick="gotoPage('list')">Collection</button>
+      <button class="nav-btn" id="nav-actors" onclick="gotoPage('actors')">Actors</button>
       <button class="nav-btn" id="nav-stats" onclick="gotoPage('stats')">Stats</button>
       <button id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark / light mode">◑</button>
     </nav>
   </div>
-  <div class="ctrl-bar">
-    <input type="text" id="qs" class="ctrl-search" placeholder="Search title, actor, tags…"/>
-    <span class="sort-label">Sort</span>
-    <select id="sb">
-      <option value="fs">Film Score</option>
-      <option value="as">Actor Score</option>
-      <option value="rt">Rating</option>
-      <option value="dt">Date</option>
-      <option value="wt">Watch count</option>
-      <option value="tl">Title A–Z</option>
-    </select>
-    <select id="sd">
-      <option value="d">↓</option>
-      <option value="a">↑</option>
-    </select>
-    <button class="filter-toggle-btn" id="filter-btn" onclick="toggleFilterPanel()">⚙ Filters</button>
-    <button class="reset-btn" id="reset-btn" onclick="resetFilters()" title="Clear all filters">✕ Reset</button>
+  <!-- Collection controls -->
+  <div id="collection-controls">
+    <div class="ctrl-bar">
+      <input type="text" id="qs" class="ctrl-search" placeholder="Search title, actor, tags…"/>
+      <span class="sort-label">Sort</span>
+      <select id="sb">
+        <option value="fs">Film Score</option>
+        <option value="as">Actor Score</option>
+        <option value="rt">Rating</option>
+        <option value="dt">Date</option>
+        <option value="wt">Watch count</option>
+        <option value="tl">Title A–Z</option>
+      </select>
+      <select id="sd"><option value="d">↓</option><option value="a">↑</option></select>
+      <button class="filter-toggle-btn" id="filter-btn" onclick="toggleFilterPanel()">⚙ Filters</button>
+      <button class="reset-btn" id="reset-btn" onclick="resetFilters()" title="Clear all filters">✕ Reset</button>
+    </div>
+    <div class="filter-panel" id="filter-panel">
+      <div class="filter-grid">
+        <div class="filter-item filter-select"><label>Film Type</label><select id="ftype"><option value="">All types</option></select></div>
+        <div class="filter-item filter-select"><label>Rating</label><select id="frating">
+          <option value="">All ratings</option>
+          <option value="5">★★★★★ (5)</option><option value="4">★★★★☆ (4)</option>
+          <option value="3">★★★☆☆ (3)</option><option value="2">★★☆☆☆ (2)</option>
+          <option value="1">★☆☆☆☆ (1)</option>
+        </select></div>
+        <div class="filter-item filter-select"><label>Actor Type</label><select id="factype"><option value="">All actor types</option></select></div>
+        <div class="filter-item filter-select"><label>Form</label><select id="fform"><option value="">All forms</option></select></div>
+        <div class="filter-item filter-select"><label>View</label><select id="fview"><option value="">All views</option></select></div>
+        <div class="filter-item filter-select"><label>Blocked</label><select id="fblocked"><option value="">Any</option></select></div>
+        <div class="filter-item"><label>Tag</label><input type="text" id="ftag" class="filter-select" placeholder="e.g. outdoor" style="width:130px"/></div>
+        <div class="filter-item"><label>Scene</label><input type="text" id="fscene" class="filter-select" placeholder="scene name" style="width:130px"/></div>
+        <div class="filter-item"><label>Actor Name</label><input type="text" id="fname" class="filter-select" placeholder="name" style="width:130px"/></div>
+        <div class="filter-item"><label>Min Pacing</label><input type="number" id="fpmin" class="filter-num" placeholder="0" min="0"/></div>
+        <div class="filter-item"><label>Max Pacing</label><input type="number" id="fpmax" class="filter-num" placeholder="" min="0"/></div>
+        <div class="filter-item"><label>Min Watches</label><input type="number" id="fwmin" class="filter-num" placeholder="0" min="0"/></div>
+      </div>
+    </div>
   </div>
-  <div class="filter-panel" id="filter-panel">
-    <div class="filter-grid">
-      <div class="filter-item filter-select"><label>Film Type</label><select id="ftype"><option value="">All types</option></select></div>
-      <div class="filter-item filter-select"><label>Rating</label><select id="frating">
-        <option value="">All ratings</option>
-        <option value="5">★★★★★ (5)</option>
-        <option value="4">★★★★☆ (4)</option>
-        <option value="3">★★★☆☆ (3)</option>
-        <option value="2">★★☆☆☆ (2)</option>
-        <option value="1">★☆☆☆☆ (1)</option>
-      </select></div>
-      <div class="filter-item filter-select"><label>Actor Type</label><select id="factype"><option value="">All actor types</option></select></div>
-      <div class="filter-item filter-select"><label>Form</label><select id="fform"><option value="">All forms</option></select></div>
-      <div class="filter-item filter-select"><label>View</label><select id="fview"><option value="">All views</option></select></div>
-      <div class="filter-item filter-select"><label>Blocked</label><select id="fblocked"><option value="">Any</option></select></div>
-      <div class="filter-item"><label>Tag</label><input type="text" id="ftag" class="filter-select" placeholder="e.g. outdoor" style="width:130px"/></div>
-      <div class="filter-item"><label>Scene</label><input type="text" id="fscene" class="filter-select" placeholder="scene name" style="width:130px"/></div>
-      <div class="filter-item"><label>Actor Name</label><input type="text" id="fname" class="filter-select" placeholder="name" style="width:130px"/></div>
-      <div class="filter-item"><label>Min Pacing</label><input type="number" id="fpmin" class="filter-num" placeholder="0" min="0"/></div>
-      <div class="filter-item"><label>Max Pacing</label><input type="number" id="fpmax" class="filter-num" placeholder="" min="0"/></div>
-      <div class="filter-item"><label>Min Watches</label><input type="number" id="fwmin" class="filter-num" placeholder="0" min="0"/></div>
+  <!-- Actors controls -->
+  <div id="actor-controls" style="display:none">
+    <div class="ctrl-bar">
+      <input type="text" id="actor-qs" class="ctrl-search" placeholder="Search actors…"/>
+      <span class="sort-label">Sort</span>
+      <select id="actor-sb">
+        <option value="count">Film count</option>
+        <option value="rating">Avg rating</option>
+        <option value="score">Avg film score</option>
+        <option value="name">Name A–Z</option>
+      </select>
     </div>
   </div>
 </header>
@@ -294,7 +309,6 @@ canvas{width:100%!important;display:block}
       <div class="stats-row" id="stats-row"></div>
       <span class="page-info" id="page-info"></span>
     </div>
-
     <button class="graphs-toggle-btn" id="graphs-toggle-btn" onclick="toggleGraphs()">
       <span class="arrow">▼</span> Charts
     </button>
@@ -305,10 +319,19 @@ canvas{width:100%!important;display:block}
         <div class="graph-box"><div class="graph-title">Watch Count Distribution</div><div class="chart-wrap"><canvas id="chart-watch"></canvas></div></div>
       </div>
     </div>
-
     <div class="grid" id="grid"></div>
     <div class="empty" id="empty">No movies match your filters.</div>
-    <div class="pagination" id="pagination"></div>
+    <div class="scroll-loading" id="scroll-loading">Loading more…</div>
+    <div id="scroll-sentinel"></div>
+  </div>
+
+  <!-- Actors page -->
+  <div class="page-section" id="page-actors">
+    <div class="top-row" style="padding:16px 28px 0">
+      <div class="stats-row" id="actor-stats-row"></div>
+    </div>
+    <div class="actor-grid" id="actor-grid"></div>
+    <div class="empty" id="actor-empty">No actors found.</div>
   </div>
 
   <!-- Stats page -->
@@ -317,7 +340,7 @@ canvas{width:100%!important;display:block}
   </div>
 </div>
 
-<!-- Modal -->
+<!-- Film modal -->
 <div class="modal-backdrop" id="modal-backdrop" onclick="closeModal(event)">
   <div class="modal" id="modal">
     <div id="modal-inner"></div>
@@ -330,16 +353,18 @@ canvas{width:100%!important;display:block}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 // ── Config ──
-const PAGE_SIZE = 60;
+const BATCH_SIZE = 48;
 
 // ── State ──
-let D = [];        // all movies
-let fil = [];      // filtered
-let _page = 1;
-let _maxFS = 1;    // max film score in dataset (for normalization)
-let _maxAS = 1;    // max actor score in dataset
+let D = [];
+let fil = [];
+let _rendered = 0;
+let _maxFS = 1;
+let _maxAS = 1;
 let _modalIdx = -1;
 let _chartsInst = {};
+let _actors = [];
+let _currentPage = 'list';
 
 // ── Theme ──
 function toggleTheme() {
@@ -352,11 +377,15 @@ function toggleTheme() {
 
 // ── Page nav ──
 function gotoPage(p) {
+  _currentPage = p;
   document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + p).classList.add('active');
   document.getElementById('nav-' + p).classList.add('active');
+  document.getElementById('collection-controls').style.display = p === 'list' ? '' : 'none';
+  document.getElementById('actor-controls').style.display = p === 'actors' ? '' : 'none';
   if (p === 'stats') renderStatsPage();
+  if (p === 'actors') renderActorsPage();
   history.replaceState(null, '', location.pathname + (p !== 'list' ? '#' + p : ''));
 }
 
@@ -385,7 +414,7 @@ function processCSV(text) {
   const rows = parseCSV(text);
   if (!rows.length) return [];
 
-  // Find header row by searching for 'Title' column (headers on sheet row 2)
+  // Find header row (headers on sheet row 2)
   let headerIdx = 0;
   for (let i = 0; i < Math.min(5, rows.length); i++) {
     if (rows[i].some(h => h.trim() === 'Title')) { headerIdx = i; break; }
@@ -395,7 +424,7 @@ function processCSV(text) {
   const idx = {};
   headers.forEach((h, i) => { if (!(h.trim() in idx)) idx[h.trim()] = i; });
 
-  // Handle the two 'Type' columns (film type first, actor type second)
+  // Two 'Type' columns: film type (first), actor type (second)
   const typePositions = [];
   headers.forEach((h, i) => { if (h.trim() === 'Type') typePositions.push(i); });
   const FILM_TYPE_COL = typePositions[0] ?? -1;
@@ -409,33 +438,30 @@ function processCSV(text) {
     const row = rows[i];
     const title = g(row, 'Title');
     if (!title) continue;
-
-    const rawFS = g(row, 'Film Score');
-    const rawAS = g(row, 'Actor Score');
-
     movies.push({
-      filmScore: pInt(rawFS),
+      filmScore:  pInt(g(row, 'Film Score')),
       title,
-      length: pInt(g(row, 'Length')),
-      scenes: (g(row, 'Scenes') || '').split(',').map(s => s.trim()).filter(Boolean),
-      type: FILM_TYPE_COL >= 0 && FILM_TYPE_COL < row.length ? (row[FILM_TYPE_COL] || '').trim() : '',
-      code: g(row, 'Code'),
-      location: g(row, 'Location'),
-      date: g(row, 'Date'),
-      watch: pInt(g(row, 'Watch')),
-      rating: pInt(g(row, 'Rating')),
-      actorScore: pInt(rawAS),
-      name: g(row, 'Name'),
-      actorType: ACTOR_TYPE_COL >= 0 && ACTOR_TYPE_COL < row.length ? (row[ACTOR_TYPE_COL] || '').trim() : '',
-      front: pInt(g(row, 'Front')),
-      back: pInt(g(row, 'Back')),
-      overall: pInt(g(row, 'Overall')),
-      face: pInt(g(row, 'Face')),
-      form: g(row, 'Form'),
-      view: g(row, 'View'),
-      blocked: g(row, 'Blocked'),
-      pacing: pInt(g(row, 'Pacing')),
-      tags: (g(row, 'Tags') || '').split(',').map(s => s.trim()).filter(Boolean),
+      titleUrl:   g(row, 'Title URL'),
+      length:     pInt(g(row, 'Length')),
+      scenes:     (g(row, 'Scenes') || '').split(',').map(s => s.trim()).filter(Boolean),
+      type:       FILM_TYPE_COL >= 0 ? (row[FILM_TYPE_COL] || '').trim() : '',
+      code:       g(row, 'Code'),
+      location:   g(row, 'Location'),
+      date:       g(row, 'Date'),
+      watch:      pInt(g(row, 'Watch')),
+      rating:     pInt(g(row, 'Rating')),
+      actorScore: pInt(g(row, 'Actor Score')),
+      name:       g(row, 'Name'),
+      actorType:  ACTOR_TYPE_COL >= 0 ? (row[ACTOR_TYPE_COL] || '').trim() : '',
+      front:      pInt(g(row, 'Front')),
+      back:       pInt(g(row, 'Back')),
+      overall:    pInt(g(row, 'Overall')),
+      face:       pInt(g(row, 'Face')),
+      form:       g(row, 'Form'),
+      view:       g(row, 'View'),
+      blocked:    g(row, 'Blocked'),
+      pacing:     pInt(g(row, 'Pacing')),
+      tags:       (g(row, 'Tags') || '').split(',').map(s => s.trim()).filter(Boolean),
     });
   }
   return movies;
@@ -445,193 +471,190 @@ function processCSV(text) {
 function normFS(v) { return _maxFS > 0 ? Math.round(v / _maxFS * 100) : 0; }
 function normAS(v) { return _maxAS > 0 ? Math.round(v / _maxAS * 100) : 0; }
 
-// ── Rating stars ──
-function stars(r, total = 5) {
-  if (!r) return '<span style="color:#ccc">—</span>';
+// ── Stars ──
+function stars(r) {
+  if (!r) return '—';
   let s = '';
-  for (let i = 1; i <= total; i++) s += i <= r ? '★' : '☆';
+  for (let i = 1; i <= 5; i++) s += i <= r ? '★' : '☆';
   return s;
+}
+function starsColor(rc) {
+  return rc === 'r1' ? '#c06050' : rc === 'r5' ? '#5070c0' : '#8a9e60';
 }
 
 // ── Rating class ──
 function rClass(r) { return r >= 1 && r <= 5 ? 'r' + r : 'r0'; }
 
+// ── Escape HTML ──
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
 // ── Populate filter dropdowns ──
 function populateFilters() {
-  const types = [...new Set(D.map(m => m.type).filter(Boolean))].sort();
-  const acTypes = [...new Set(D.map(m => m.actorType).filter(Boolean))].sort();
-  const forms = [...new Set(D.map(m => m.form).filter(Boolean))].sort();
-  const views = [...new Set(D.map(m => m.view).filter(Boolean))].sort();
-  const blockeds = [...new Set(D.map(m => m.blocked).filter(Boolean))].sort();
-
-  function fill(id, opts) {
+  function fill(id, opts, first) {
     const el = document.getElementById(id);
-    const first = el.options[0];
+    const fo = el.options[0];
+    fo.textContent = first;
     el.innerHTML = '';
-    el.appendChild(first);
+    el.appendChild(fo);
     opts.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; el.appendChild(o); });
   }
-  fill('ftype', types);
-  fill('factype', acTypes);
-  fill('fform', forms);
-  fill('fview', views);
-  fill('fblocked', blockeds);
+  fill('ftype',   [...new Set(D.map(m => m.type).filter(Boolean))].sort(), 'All types');
+  fill('factype', [...new Set(D.map(m => m.actorType).filter(Boolean))].sort(), 'All actor types');
+  fill('fform',   [...new Set(D.map(m => m.form).filter(Boolean))].sort(), 'All forms');
+  fill('fview',   [...new Set(D.map(m => m.view).filter(Boolean))].sort(), 'All views');
+  fill('fblocked',[...new Set(D.map(m => m.blocked).filter(Boolean))].sort(), 'Any');
 }
 
 // ── Filter & sort ──
 function af() {
-  const q = (document.getElementById('qs').value || '').toLowerCase();
-  const ftype = document.getElementById('ftype').value;
-  const frating = document.getElementById('frating').value;
-  const factype = document.getElementById('factype').value;
-  const fform = document.getElementById('fform').value;
-  const fview = document.getElementById('fview').value;
-  const fblocked = document.getElementById('fblocked').value;
-  const ftag = (document.getElementById('ftag').value || '').toLowerCase().trim();
+  const q      = (document.getElementById('qs').value || '').toLowerCase();
+  const ftype  = document.getElementById('ftype').value;
+  const frating= document.getElementById('frating').value;
+  const factype= document.getElementById('factype').value;
+  const fform  = document.getElementById('fform').value;
+  const fview  = document.getElementById('fview').value;
+  const fblocked=document.getElementById('fblocked').value;
+  const ftag   = (document.getElementById('ftag').value || '').toLowerCase().trim();
   const fscene = (document.getElementById('fscene').value || '').toLowerCase().trim();
-  const fname = (document.getElementById('fname').value || '').toLowerCase().trim();
-  const fpmin = parseInt(document.getElementById('fpmin').value) || 0;
-  const fpmax = parseInt(document.getElementById('fpmax').value) || 0;
-  const fwmin = parseInt(document.getElementById('fwmin').value) || 0;
-  const sb = document.getElementById('sb').value;
-  const sd = document.getElementById('sd').value;
+  const fname  = (document.getElementById('fname').value || '').toLowerCase().trim();
+  const fpmin  = parseInt(document.getElementById('fpmin').value) || 0;
+  const fpmax  = parseInt(document.getElementById('fpmax').value) || 0;
+  const fwmin  = parseInt(document.getElementById('fwmin').value) || 0;
+  const sb     = document.getElementById('sb').value;
+  const sd     = document.getElementById('sd').value;
 
-  const hasFilters = ftype || frating || factype || fform || fview || fblocked || ftag || fscene || fname || fpmin || fpmax || fwmin;
+  const hasFilters = ftype||frating||factype||fform||fview||fblocked||ftag||fscene||fname||fpmin||fpmax||fwmin;
   document.getElementById('filter-btn').classList.toggle('has-filters', !!hasFilters);
-  document.getElementById('reset-btn').classList.toggle('active', !!hasFilters || !!q);
+  document.getElementById('reset-btn').classList.toggle('active', !!(hasFilters || q));
 
   fil = D.filter(m => {
-    if (q) {
-      const searchable = [m.title, m.name, m.code, m.location, ...m.tags, ...m.scenes].join(' ').toLowerCase();
-      if (!searchable.includes(q)) return false;
-    }
-    if (ftype && m.type !== ftype) return false;
+    if (q && !([m.title,m.name,m.code,m.location,...m.tags,...m.scenes].join(' ').toLowerCase().includes(q))) return false;
+    if (ftype   && m.type !== ftype) return false;
     if (frating && m.rating !== parseInt(frating)) return false;
     if (factype && m.actorType !== factype) return false;
-    if (fform && m.form !== fform) return false;
-    if (fview && m.view !== fview) return false;
+    if (fform   && m.form !== fform) return false;
+    if (fview   && m.view !== fview) return false;
     if (fblocked && m.blocked !== fblocked) return false;
-    if (ftag && !m.tags.some(t => t.toLowerCase().includes(ftag))) return false;
+    if (ftag   && !m.tags.some(t  => t.toLowerCase().includes(ftag)))   return false;
     if (fscene && !m.scenes.some(s => s.toLowerCase().includes(fscene))) return false;
-    if (fname && !m.name.toLowerCase().includes(fname)) return false;
-    if (fpmin && m.pacing < fpmin) return false;
-    if (fpmax && m.pacing > fpmax) return false;
-    if (fwmin && m.watch < fwmin) return false;
+    if (fname  && !m.name.toLowerCase().includes(fname)) return false;
+    if (fpmin  && m.pacing < fpmin) return false;
+    if (fpmax  && m.pacing > fpmax) return false;
+    if (fwmin  && m.watch  < fwmin) return false;
     return true;
   });
 
   fil.sort((a, b) => {
     let v = 0;
-    if (sb === 'fs') v = a.filmScore - b.filmScore;
+    if      (sb === 'fs') v = a.filmScore  - b.filmScore;
     else if (sb === 'as') v = a.actorScore - b.actorScore;
-    else if (sb === 'rt') v = a.rating - b.rating;
-    else if (sb === 'dt') v = (a.date || '').localeCompare(b.date || '');
-    else if (sb === 'wt') v = a.watch - b.watch;
+    else if (sb === 'rt') v = a.rating     - b.rating;
+    else if (sb === 'dt') v = (a.date||'').localeCompare(b.date||'');
+    else if (sb === 'wt') v = a.watch      - b.watch;
     else if (sb === 'tl') v = a.title.localeCompare(b.title);
     return sd === 'd' ? -v : v;
   });
 
-  _page = 1;
   renderGrid();
   updateStats();
   saveURLState();
 }
 
-// ── Render grid ──
-function renderGrid() {
-  const grid = document.getElementById('grid');
-  const empty = document.getElementById('empty');
-  const pageInfo = document.getElementById('page-info');
-
-  if (!fil.length) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    document.getElementById('pagination').innerHTML = '';
-    pageInfo.textContent = '0 results';
-    return;
-  }
-  empty.style.display = 'none';
-
-  const start = (_page - 1) * PAGE_SIZE;
-  const page = fil.slice(start, start + PAGE_SIZE);
-  const total = fil.length;
-  const totalPages = Math.ceil(total / PAGE_SIZE);
-
-  pageInfo.textContent = total === D.length
-    ? `${total} films`
-    : `${total} of ${D.length} films`;
-
-  grid.innerHTML = page.map((m, i) => {
-    const fsNorm = normFS(m.filmScore);
-    const tagPills = m.tags.slice(0, 4).map(t => `<span class="pill">${esc(t)}</span>`).join('');
-    const scenePills = m.scenes.slice(0, 2).map(s => `<span class="pill pill-scene">${esc(s)}</span>`).join('');
-    const rc = rClass(m.rating);
-    const starsHtml = m.rating ? `<span style="color:${rc === 'r1' ? '#c06050' : rc === 'r5' ? '#5070c0' : '#8a9e60'};font-size:13px">${stars(m.rating)}</span>` : '';
-    const metaParts = [];
-    if (m.length) metaParts.push(m.length + ' min');
-    if (m.location) metaParts.push(esc(m.location));
-    const metaHtml = metaParts.join('<span class="card-meta-sep"> · </span>');
-    return `<div class="card" onclick="openModal(${start + i})" data-idx="${start + i}">
+// ── Build card HTML ──
+function cardHTML(m, idx) {
+  const fsNorm   = normFS(m.filmScore);
+  const rc       = rClass(m.rating);
+  const sc       = starsColor(rc);
+  const tagPills = m.tags.slice(0,4).map(t => `<span class="pill">${esc(t)}</span>`).join('');
+  const scenePills = m.scenes.slice(0,2).map(s => `<span class="pill pill-scene">${esc(s)}</span>`).join('');
+  const metaParts = [];
+  if (m.length)   metaParts.push(m.length + ' min');
+  if (m.location) metaParts.push(esc(m.location));
+  const metaHtml = metaParts.join('<span class="card-meta-sep"> · </span>');
+  const linkBtn  = m.titleUrl
+    ? `<a class="card-link-btn" href="${esc(m.titleUrl)}" target="_blank" rel="noopener" title="Open link" onclick="event.stopPropagation()">↗</a>`
+    : '';
+  const footerParts = [];
+  if (m.watch)  footerParts.push(m.watch + ' watch' + (m.watch !== 1 ? 'es' : ''));
+  if (m.date)   footerParts.push(m.date);
+  return `<div class="card" onclick="openModal(${idx})">
   <div class="card-score-header ${rc}">
     <div>
       <div class="card-film-score">${fsNorm}<span style="font-size:11px;font-weight:400">%</span></div>
       <div class="card-film-score-label">film score</div>
     </div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-      ${starsHtml}
-      ${m.type ? `<span class="card-type-pill">${esc(m.type)}</span>` : ''}
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+      ${m.rating ? `<span style="color:${sc};font-size:13px;letter-spacing:1px">${stars(m.rating)}</span>` : ''}
+      <div style="display:flex;align-items:center;gap:4px">
+        ${m.type ? `<span class="card-type-pill">${esc(m.type)}</span>` : ''}
+        ${linkBtn}
+      </div>
     </div>
   </div>
   <div class="card-body">
     <div class="card-title">${esc(m.title)}</div>
     ${m.name ? `<div class="card-meta">${esc(m.name)}</div>` : ''}
-    ${metaHtml ? `<div class="card-meta" style="margin-top:1px">${metaHtml}</div>` : ''}
+    ${metaHtml ? `<div class="card-meta">${metaHtml}</div>` : ''}
     <div class="card-pills">${tagPills}${scenePills}</div>
   </div>
-  <div class="card-footer">AS ${normAS(m.actorScore)}% · ${m.watch ? m.watch + ' watch' + (m.watch !== 1 ? 'es' : '') : 'unwatched'}${m.date ? ' · ' + m.date : ''}</div>
+  ${footerParts.length ? `<div class="card-footer">${footerParts.join(' · ')}</div>` : ''}
 </div>`;
-  }).join('');
-
-  renderPagination(totalPages);
 }
 
-// ── Pagination ──
-function renderPagination(totalPages) {
-  const el = document.getElementById('pagination');
-  if (totalPages <= 1) { el.innerHTML = ''; return; }
-  const maxBtns = 7;
-  let pages = [];
-  if (totalPages <= maxBtns) {
-    for (let i = 1; i <= totalPages; i++) pages.push(i);
-  } else {
-    pages = [1];
-    let lo = Math.max(2, _page - 2), hi = Math.min(totalPages - 1, _page + 2);
-    if (lo > 2) pages.push('…');
-    for (let i = lo; i <= hi; i++) pages.push(i);
-    if (hi < totalPages - 1) pages.push('…');
-    pages.push(totalPages);
+// ── Render grid (infinite scroll) ──
+function renderGrid() {
+  const grid  = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+  const info  = document.getElementById('page-info');
+
+  grid.innerHTML = '';
+  _rendered = 0;
+
+  if (!fil.length) {
+    empty.style.display = 'block';
+    info.textContent = '0 results';
+    document.getElementById('scroll-loading').style.display = 'none';
+    return;
   }
-  el.innerHTML = `<button class="page-btn" onclick="changePage(${_page - 1})" ${_page === 1 ? 'disabled' : ''}>‹</button>` +
-    pages.map(p => p === '…' ? `<span style="color:#9aae80;padding:0 4px">…</span>` :
-      `<button class="page-btn${p === _page ? ' active' : ''}" onclick="changePage(${p})">${p}</button>`).join('') +
-    `<button class="page-btn" onclick="changePage(${_page + 1})" ${_page === totalPages ? 'disabled' : ''}>›</button>`;
+  empty.style.display = 'none';
+  info.textContent = fil.length === D.length ? `${fil.length} films` : `${fil.length} of ${D.length} films`;
+  appendBatch();
 }
 
-function changePage(p) {
-  _page = p;
-  renderGrid();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+function appendBatch() {
+  if (_rendered >= fil.length) {
+    document.getElementById('scroll-loading').style.display = 'none';
+    return;
+  }
+  const grid  = document.getElementById('grid');
+  const batch = fil.slice(_rendered, _rendered + BATCH_SIZE);
+  const frag  = document.createDocumentFragment();
+  batch.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.innerHTML = cardHTML(m, _rendered + i);
+    frag.appendChild(div.firstElementChild);
+  });
+  grid.appendChild(frag);
+  _rendered += batch.length;
+  document.getElementById('scroll-loading').style.display = _rendered < fil.length ? 'block' : 'none';
 }
+
+// ── Infinite scroll observer ──
+const _scrollObs = new IntersectionObserver(([entry]) => {
+  if (entry.isIntersecting && _currentPage === 'list') appendBatch();
+}, { rootMargin: '400px' });
 
 // ── Stats summary ──
 function updateStats() {
-  const avgRating = fil.length ? (fil.reduce((s, m) => s + m.rating, 0) / fil.length).toFixed(1) : '—';
-  const avgFS = fil.length ? Math.round(fil.reduce((s, m) => s + m.filmScore, 0) / fil.length) : 0;
-  document.getElementById('stats-row').innerHTML = `
-    <div class="stat"><b>${fil.length}</b> Films</div>
-    <div class="stat"><b>${avgRating}</b> Avg Rating</div>
-    <div class="stat"><b>${avgFS.toLocaleString()}</b> Avg Film Score</div>
-  `;
+  const rated = fil.filter(m => m.rating > 0);
+  const avgRating = rated.length ? (rated.reduce((s,m) => s+m.rating, 0) / rated.length).toFixed(1) : '—';
+  const avgFS = fil.length ? Math.round(fil.reduce((s,m) => s+m.filmScore, 0) / fil.length) : 0;
+  document.getElementById('stats-row').innerHTML =
+    `<div class="stat"><b>${fil.length}</b> Films</div>` +
+    `<div class="stat"><b>${avgRating}</b> Avg Rating</div>` +
+    `<div class="stat"><b>${avgFS.toLocaleString()}</b> Avg Film Score</div>`;
 }
 
 // ── Modal ──
@@ -639,30 +662,32 @@ function openModal(idx) {
   _modalIdx = idx;
   const m = fil[idx];
   if (!m) return;
-  const rc = rClass(m.rating);
+  const rc     = rClass(m.rating);
+  const sc     = starsColor(rc);
   const fsNorm = normFS(m.filmScore);
   const asNorm = normAS(m.actorScore);
 
-  const tagsHtml = m.tags.map(t => `<span class="modal-pill">${esc(t)}</span>`).join('');
+  const tagsHtml  = m.tags.map(t  => `<span class="modal-pill">${esc(t)}</span>`).join('');
   const scenesHtml = m.scenes.map(s => `<span class="modal-pill" style="background:#eef0f8;border-color:#c8ccdc;color:#6a7a9a">${esc(s)}</span>`).join('');
 
   document.getElementById('modal-inner').innerHTML = `
 <div class="modal-score-header ${rc}">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-    <div>
+    <div style="min-width:0">
       <div class="modal-title">${esc(m.title)}</div>
       ${m.code ? `<div style="font-size:11px;color:#9aae80;margin-top:1px;font-style:italic">${esc(m.code)}</div>` : ''}
     </div>
     <div style="text-align:right;flex-shrink:0">
-      ${m.rating ? `<div class="rating-stars-lg" style="color:${rc === 'r1' ? '#c06050' : rc === 'r5' ? '#5070c0' : '#8a9e60'}">${stars(m.rating)}</div>` : ''}
+      ${m.rating ? `<div class="rating-stars-lg" style="color:${sc}">${stars(m.rating)}</div>` : ''}
       ${m.type ? `<div style="margin-top:4px"><span class="modal-pill">${esc(m.type)}</span></div>` : ''}
     </div>
   </div>
   ${m.name ? `<div class="modal-name">${esc(m.name)}${m.actorType ? ` · ${esc(m.actorType)}` : ''}</div>` : ''}
-  ${tagsHtml || scenesHtml ? `<div class="modal-pills">${tagsHtml}${scenesHtml}</div>` : ''}
+  ${tagsHtml||scenesHtml ? `<div class="modal-pills">${tagsHtml}${scenesHtml}</div>` : ''}
 </div>
 <div class="modal-body">
-  <div class="modal-grid">
+  ${m.titleUrl ? `<a class="modal-link-btn" href="${esc(m.titleUrl)}" target="_blank" rel="noopener">↗ Open link</a>` : ''}
+  <div class="modal-grid" style="margin-top:${m.titleUrl?'14px':'0'}">
     <div>
       <div class="modal-label">Film Score</div>
       <div class="modal-value" style="font-size:20px;font-weight:700">${m.filmScore.toLocaleString()}</div>
@@ -675,19 +700,18 @@ function openModal(idx) {
       <div class="score-bar-wrap"><div class="score-bar" style="width:${asNorm}%"></div></div>
       <div style="font-size:10px;color:#9aae80;margin-top:2px">${asNorm}% of max</div>
     </div>
-    ${m.length ? `<div><div class="modal-label">Length</div><div class="modal-value">${m.length} min</div></div>` : ''}
-    ${m.watch !== undefined ? `<div><div class="modal-label">Watches</div><div class="modal-value">${m.watch || 0}</div></div>` : ''}
-    ${m.date ? `<div><div class="modal-label">Date</div><div class="modal-value">${esc(m.date)}</div></div>` : ''}
-    ${m.location ? `<div><div class="modal-label">Location</div><div class="modal-value">${esc(m.location)}</div></div>` : ''}
-
-    ${(m.front || m.back || m.overall || m.face || m.pacing) ? `<div class="modal-section-head">Actor Details</div>` : ''}
-    ${m.front ? `<div><div class="modal-label">Front</div><div class="modal-value">${m.front}</div></div>` : ''}
-    ${m.back ? `<div><div class="modal-label">Back</div><div class="modal-value">${m.back}</div></div>` : ''}
+    ${m.length  ? `<div><div class="modal-label">Length</div><div class="modal-value">${m.length} min</div></div>` : ''}
+    ${m.watch!=null?`<div><div class="modal-label">Watches</div><div class="modal-value">${m.watch||0}</div></div>`:''}
+    ${m.date    ? `<div><div class="modal-label">Date</div><div class="modal-value">${esc(m.date)}</div></div>` : ''}
+    ${m.location? `<div><div class="modal-label">Location</div><div class="modal-value">${esc(m.location)}</div></div>` : ''}
+    ${(m.front||m.back||m.overall||m.face||m.pacing) ? '<div class="modal-section-head">Actor Details</div>' : ''}
+    ${m.front   ? `<div><div class="modal-label">Front</div><div class="modal-value">${m.front}</div></div>` : ''}
+    ${m.back    ? `<div><div class="modal-label">Back</div><div class="modal-value">${m.back}</div></div>` : ''}
     ${m.overall ? `<div><div class="modal-label">Overall</div><div class="modal-value">${m.overall}</div></div>` : ''}
-    ${m.face ? `<div><div class="modal-label">Face</div><div class="modal-value">${m.face}</div></div>` : ''}
-    ${m.pacing ? `<div><div class="modal-label">Pacing</div><div class="modal-value">${m.pacing}</div></div>` : ''}
-    ${m.form ? `<div><div class="modal-label">Form</div><div class="modal-value">${esc(m.form)}</div></div>` : ''}
-    ${m.view ? `<div><div class="modal-label">View</div><div class="modal-value">${esc(m.view)}</div></div>` : ''}
+    ${m.face    ? `<div><div class="modal-label">Face</div><div class="modal-value">${m.face}</div></div>` : ''}
+    ${m.pacing  ? `<div><div class="modal-label">Pacing</div><div class="modal-value">${m.pacing}</div></div>` : ''}
+    ${m.form    ? `<div><div class="modal-label">Form</div><div class="modal-value">${esc(m.form)}</div></div>` : ''}
+    ${m.view    ? `<div><div class="modal-label">View</div><div class="modal-value">${esc(m.view)}</div></div>` : ''}
     ${m.blocked ? `<div><div class="modal-label">Blocked</div><div class="modal-value">${esc(m.blocked)}</div></div>` : ''}
   </div>
 </div>`;
@@ -705,43 +729,37 @@ function closeModal(e) {
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// ── Filter panel ──
+// ── Filter panel toggle ──
 function toggleFilterPanel() {
   const panel = document.getElementById('filter-panel');
-  const btn = document.getElementById('filter-btn');
-  const open = panel.classList.toggle('open');
-  btn.classList.toggle('open', open);
+  const btn   = document.getElementById('filter-btn');
+  btn.classList.toggle('open', panel.classList.toggle('open'));
 }
 
 function resetFilters() {
-  ['qs','ftag','fscene','fname','fpmin','fpmax','fwmin'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  ['ftype','frating','factype','fform','fview','fblocked'].forEach(id => { const el = document.getElementById(id); if (el) el.selectedIndex = 0; });
+  ['qs','ftag','fscene','fname','fpmin','fpmax','fwmin'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['ftype','frating','factype','fform','fview','fblocked'].forEach(id => { const el=document.getElementById(id); if(el) el.selectedIndex=0; });
   af();
 }
 
 // ── Charts ──
 function toggleGraphs() {
   const panel = document.getElementById('graphs-panel');
-  const btn = document.getElementById('graphs-toggle-btn');
-  const open = panel.classList.toggle('open');
-  btn.classList.toggle('open', open);
-  if (open) renderCharts();
+  const btn   = document.getElementById('graphs-toggle-btn');
+  btn.classList.toggle('open', panel.classList.toggle('open'));
+  if (panel.classList.contains('open')) renderCharts();
 }
 
 function destroyChart(id) { if (_chartsInst[id]) { _chartsInst[id].destroy(); delete _chartsInst[id]; } }
 
-function chartColors() {
+function renderCharts() {
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  return {
+  const c = {
     grid: dark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)',
     tick: dark ? '#7a9060' : '#9aae80',
-    bar: dark ? '#7a9060' : '#8a9e60',
+    bar:  dark ? '#7a9060' : '#8a9e60',
   };
-}
-
-function renderCharts() {
-  const c = chartColors();
-  const baseOpts = {
+  const base = {
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.raw } } },
     scales: {
@@ -750,91 +768,125 @@ function renderCharts() {
     },
   };
 
-  // Rating distribution
   destroyChart('rating');
-  const ratingCounts = [0,0,0,0,0];
-  fil.forEach(m => { if (m.rating >= 1 && m.rating <= 5) ratingCounts[m.rating - 1]++; });
+  const rc = [0,0,0,0,0];
+  fil.forEach(m => { if (m.rating >= 1 && m.rating <= 5) rc[m.rating-1]++; });
   _chartsInst['rating'] = new Chart(document.getElementById('chart-rating'), {
     type: 'bar',
-    data: {
-      labels: ['★', '★★', '★★★', '★★★★', '★★★★★'],
-      datasets: [{ data: ratingCounts, backgroundColor: ['#e08080','#e0b060','#b0c860','#60c0a0','#7090e0'], borderRadius: 6 }],
-    },
-    options: { ...baseOpts, scales: { ...baseOpts.scales, x: { ...baseOpts.scales.x, ticks: { ...baseOpts.scales.x.ticks, font: { size: 14 } } } } },
+    data: { labels: ['★','★★','★★★','★★★★','★★★★★'],
+      datasets: [{ data: rc, backgroundColor: ['#e08080','#e0b060','#b0c860','#60c0a0','#7090e0'], borderRadius: 6 }] },
+    options: { ...base, scales: { ...base.scales, x: { ...base.scales.x, ticks: { ...base.scales.x.ticks, font: { size: 14 } } } } },
   });
 
-  // Film score distribution (buckets of 10%)
   destroyChart('fs');
-  const fsBuckets = new Array(10).fill(0);
-  fil.forEach(m => {
-    const pct = normFS(m.filmScore);
-    const bi = Math.min(9, Math.floor(pct / 10));
-    fsBuckets[bi]++;
-  });
+  const fb = new Array(10).fill(0);
+  fil.forEach(m => { fb[Math.min(9, Math.floor(normFS(m.filmScore) / 10))]++; });
   _chartsInst['fs'] = new Chart(document.getElementById('chart-fs'), {
     type: 'bar',
-    data: {
-      labels: ['0-9%','10-19%','20-29%','30-39%','40-49%','50-59%','60-69%','70-79%','80-89%','90-100%'],
-      datasets: [{ data: fsBuckets, backgroundColor: c.bar, borderRadius: 4 }],
-    },
-    options: { ...baseOpts, scales: { ...baseOpts.scales, x: { ...baseOpts.scales.x, ticks: { ...baseOpts.scales.x.ticks, maxRotation: 45 } } } },
+    data: { labels: ['0-9%','10-19%','20-29%','30-39%','40-49%','50-59%','60-69%','70-79%','80-89%','90-100%'],
+      datasets: [{ data: fb, backgroundColor: c.bar, borderRadius: 4 }] },
+    options: { ...base, scales: { ...base.scales, x: { ...base.scales.x, ticks: { ...base.scales.x.ticks, maxRotation: 45 } } } },
   });
 
-  // Watch count distribution
   destroyChart('watch');
-  const watchBuckets = { '0': 0, '1': 0, '2': 0, '3': 0, '4': 0, '5+': 0 };
-  fil.forEach(m => {
-    const w = m.watch || 0;
-    const k = w >= 5 ? '5+' : String(w);
-    watchBuckets[k]++;
-  });
+  const wb = { '0':0,'1':0,'2':0,'3':0,'4':0,'5+':0 };
+  fil.forEach(m => { const k = (m.watch||0) >= 5 ? '5+' : String(m.watch||0); wb[k]++; });
   _chartsInst['watch'] = new Chart(document.getElementById('chart-watch'), {
     type: 'bar',
-    data: {
-      labels: Object.keys(watchBuckets),
-      datasets: [{ data: Object.values(watchBuckets), backgroundColor: c.bar, borderRadius: 4 }],
-    },
-    options: baseOpts,
+    data: { labels: Object.keys(wb), datasets: [{ data: Object.values(wb), backgroundColor: c.bar, borderRadius: 4 }] },
+    options: base,
   });
+}
+
+// ── Actors ──
+function buildActors() {
+  const map = {};
+  D.forEach(m => {
+    if (!m.name) return;
+    m.name.split(',').map(n => n.trim()).filter(n => n && n !== '?').forEach(name => {
+      if (!map[name]) map[name] = { name, movies: [] };
+      map[name].movies.push(m);
+    });
+  });
+  return Object.values(map);
+}
+
+function renderActorsPage() {
+  const q  = (document.getElementById('actor-qs').value  || '').toLowerCase();
+  const sb = document.getElementById('actor-sb').value;
+
+  let actors = _actors.filter(a => !q || a.name.toLowerCase().includes(q));
+
+  actors.sort((a, b) => {
+    if (sb === 'count')  return b.movies.length - a.movies.length;
+    if (sb === 'rating') {
+      const ar = a => { const r = a.movies.filter(m => m.rating); return r.length ? r.reduce((s,m) => s+m.rating,0)/r.length : 0; };
+      return ar(b) - ar(a);
+    }
+    if (sb === 'score') {
+      const as = a => a.movies.reduce((s,m) => s+m.filmScore, 0) / a.movies.length;
+      return as(b) - as(a);
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  const grid  = document.getElementById('actor-grid');
+  const empty = document.getElementById('actor-empty');
+
+  document.getElementById('actor-stats-row').innerHTML =
+    `<div class="stat"><b>${actors.length}</b> Actors</div>`;
+
+  if (!actors.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  grid.innerHTML = actors.map(a => {
+    const ratedMovies = a.movies.filter(m => m.rating > 0);
+    const avgRating   = ratedMovies.length ? ratedMovies.reduce((s,m) => s+m.rating,0) / ratedMovies.length : 0;
+    const avgFS       = normFS(a.movies.reduce((s,m) => s+m.filmScore,0) / a.movies.length);
+    const starsStr    = avgRating ? stars(Math.round(avgRating)) : '';
+    return `<div class="actor-card" onclick="showActorFilms(${JSON.stringify(esc(a.name))})">
+  <div class="actor-name">${esc(a.name)}</div>
+  <div class="actor-stat"><b>${a.movies.length}</b> film${a.movies.length !== 1 ? 's' : ''}</div>
+  ${starsStr ? `<div class="actor-stars">${starsStr}</div>` : ''}
+  <div class="actor-stat">Avg score <b>${avgFS}%</b></div>
+</div>`;
+  }).join('');
+}
+
+function showActorFilms(name) {
+  gotoPage('list');
+  document.getElementById('fname').value = name;
+  af();
 }
 
 // ── Stats page ──
 function renderStatsPage() {
   const el = document.getElementById('stats-grid');
-  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
 
   function topList(items, title, limit = 12) {
     if (!items.length) return '';
     const max = items[0][1];
-    const rows = items.slice(0, limit).map(([name, count]) => `
-      <div class="stats-list-row">
-        <span class="stats-list-name">${esc(name)}</span>
-        <div class="stats-list-bar-wrap"><div class="stats-list-bar" style="width:${Math.round(count/max*100)}%"></div></div>
-        <span class="stats-list-count">${count}</span>
-      </div>`).join('');
-    return `<div class="stats-chart-box"><div class="stats-chart-title">${title}</div>${rows}</div>`;
+    return `<div class="stats-chart-box"><div class="stats-chart-title">${title}</div>` +
+      items.slice(0, limit).map(([name, count]) =>
+        `<div class="stats-list-row">
+          <span class="stats-list-name">${esc(name)}</span>
+          <div class="stats-list-bar-wrap"><div class="stats-list-bar" style="width:${Math.round(count/max*100)}%"></div></div>
+          <span class="stats-list-count">${count}</span>
+        </div>`).join('') + '</div>';
   }
 
   function countBy(key) {
     const map = {};
-    D.forEach(m => {
-      const v = m[key];
-      if (!v) return;
-      map[v] = (map[v] || 0) + 1;
-    });
-    return Object.entries(map).sort((a, b) => b[1] - a[1]);
+    D.forEach(m => { if (m[key]) map[m[key]] = (map[m[key]]||0)+1; });
+    return Object.entries(map).sort((a,b) => b[1]-a[1]);
   }
-
-  function countArrayBy(key) {
+  function countArr(key) {
     const map = {};
-    D.forEach(m => {
-      (m[key] || []).forEach(v => { if (v) map[v] = (map[v] || 0) + 1; });
-    });
-    return Object.entries(map).sort((a, b) => b[1] - a[1]);
+    D.forEach(m => { (m[key]||[]).forEach(v => { if(v) map[v]=(map[v]||0)+1; }); });
+    return Object.entries(map).sort((a,b) => b[1]-a[1]);
   }
 
-  // Top films by score
-  const topFilms = [...D].sort((a, b) => b.filmScore - a.filmScore).slice(0, 10);
+  const topFilms = [...D].sort((a,b) => b.filmScore-a.filmScore).slice(0,10);
   const topFilmsMax = topFilms[0]?.filmScore || 1;
   const topFilmsHtml = `<div class="stats-chart-box"><div class="stats-chart-title">Top Films by Score</div>` +
     topFilms.map(m => `<div class="stats-list-row">
@@ -843,22 +895,25 @@ function renderStatsPage() {
       <span class="stats-list-count">${m.filmScore.toLocaleString()}</span>
     </div>`).join('') + '</div>';
 
-  // Top actors by score
-  const topActors = [...D].sort((a, b) => b.actorScore - a.actorScore).filter(m => m.name).slice(0, 10);
-  const topActorsMax = topActors[0]?.actorScore || 1;
-  const topActorsHtml = topActors.length ? `<div class="stats-chart-box"><div class="stats-chart-title">Top Actors by Score</div>` +
-    topActors.map(m => `<div class="stats-list-row">
-      <span class="stats-list-name">${esc(m.name)}</span>
-      <div class="stats-list-bar-wrap"><div class="stats-list-bar" style="width:${Math.round(m.actorScore/topActorsMax*100)}%"></div></div>
-      <span class="stats-list-count">${m.actorScore.toLocaleString()}</span>
-    </div>`).join('') + '</div>' : '';
+  const topActorsSorted = [..._actors].sort((a,b) => {
+    const as = a => a.movies.reduce((s,m)=>s+m.filmScore,0)/a.movies.length;
+    return as(b)-as(a);
+  }).slice(0,10);
+  const topActorsMax = topActorsSorted[0] ? topActorsSorted[0].movies.reduce((s,m)=>s+m.filmScore,0)/topActorsSorted[0].movies.length : 1;
+  const topActorsHtml = topActorsSorted.length ? `<div class="stats-chart-box"><div class="stats-chart-title">Top Actors by Avg Film Score</div>` +
+    topActorsSorted.map(a => {
+      const avg = a.movies.reduce((s,m)=>s+m.filmScore,0)/a.movies.length;
+      return `<div class="stats-list-row">
+        <span class="stats-list-name">${esc(a.name)}</span>
+        <div class="stats-list-bar-wrap"><div class="stats-list-bar" style="width:${Math.round(avg/topActorsMax*100)}%"></div></div>
+        <span class="stats-list-count">${a.movies.length}</span>
+      </div>`;
+    }).join('') + '</div>' : '';
 
-  el.innerHTML =
-    topFilmsHtml +
-    topActorsHtml +
+  el.innerHTML = topFilmsHtml + topActorsHtml +
     topList(countBy('type'), 'By Film Type') +
-    topList(countArrayBy('tags'), 'Top Tags', 15) +
-    topList(countArrayBy('scenes'), 'Top Scenes', 15) +
+    topList(countArr('tags'), 'Top Tags', 15) +
+    topList(countArr('scenes'), 'Top Scenes', 15) +
     topList(countBy('actorType'), 'By Actor Type') +
     topList(countBy('form'), 'By Form') +
     topList(countBy('view'), 'By View') +
@@ -866,30 +921,28 @@ function renderStatsPage() {
 }
 
 // ── URL state ──
-const URL_KEYS  = ['q','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','sb','sd'];
-const ELEM_IDS  = ['qs','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','sb','sd'];
+const URL_KEYS = ['q','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','sb','sd'];
+const ELEM_IDS = ['qs','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','sb','sd'];
 
 function saveURLState() {
-  const params = new URLSearchParams();
-  ELEM_IDS.forEach((id, i) => { const el = document.getElementById(id); if (el && el.value) params.set(URL_KEYS[i], el.value); });
-  const str = params.toString();
-  history.replaceState(null, '', str ? '?' + str : location.pathname);
+  const p = new URLSearchParams();
+  ELEM_IDS.forEach((id,i) => { const el=document.getElementById(id); if(el&&el.value) p.set(URL_KEYS[i],el.value); });
+  const str = p.toString();
+  history.replaceState(null,'',str?'?'+str:location.pathname);
 }
-
 function loadURLState() {
-  const params = new URLSearchParams(location.search);
-  ELEM_IDS.forEach((id, i) => { const el = document.getElementById(id); if (el && params.has(URL_KEYS[i])) el.value = params.get(URL_KEYS[i]); });
-}
-
-// ── Escape HTML ──
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const p = new URLSearchParams(location.search);
+  ELEM_IDS.forEach((id,i) => { const el=document.getElementById(id); if(el&&p.has(URL_KEYS[i])) el.value=p.get(URL_KEYS[i]); });
 }
 
 // ── Wire inputs ──
-['qs','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','sb','sd'].forEach(id => {
+[...ELEM_IDS,'sb','sd'].forEach(id => {
   const el = document.getElementById(id);
   if (el) { el.addEventListener('input', af); el.addEventListener('change', af); }
+});
+['actor-qs','actor-sb'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) { el.addEventListener('input', renderActorsPage); el.addEventListener('change', renderActorsPage); }
 });
 
 // ── Bootstrap ──
@@ -902,15 +955,19 @@ async function bootstrap() {
     const text = await res.text();
     loader.textContent = 'Parsing movies…';
     D = processCSV(text);
-    if (!D.length) throw new Error('No movies found — check that the sheet is public and the gid is correct.');
-    _maxFS = Math.max(1, ...D.map(m => m.filmScore));
-    _maxAS = Math.max(1, ...D.map(m => m.actorScore));
+    if (!D.length) throw new Error('No movies found — check that the Apps Script is deployed and the gid is correct.');
+    _maxFS  = Math.max(1, ...D.map(m => m.filmScore));
+    _maxAS  = Math.max(1, ...D.map(m => m.actorScore));
+    _actors = buildActors();
     loader.style.display = 'none';
+    _scrollObs.observe(document.getElementById('scroll-sentinel'));
     populateFilters();
     loadURLState();
-    const hash = location.hash.replace('#', '');
-    if (hash === 'stats') { gotoPage('stats'); } else { af(); }
-  } catch (e) {
+    const hash = location.hash.replace('#','');
+    if (hash === 'stats')  gotoPage('stats');
+    else if (hash === 'actors') gotoPage('actors');
+    else af();
+  } catch(e) {
     loader.innerHTML = `<div style="color:#a05050">${esc(e.message)}<br><br><button onclick="bootstrap()" style="font-family:Georgia,serif;padding:8px 20px;border:1px solid #c0cfa0;border-radius:8px;background:#fafaf6;cursor:pointer">Retry</button></div>`;
   }
 }
