@@ -155,6 +155,35 @@ canvas{width:100%!important;display:block}
 #scroll-sentinel{height:1px;margin-top:24px}
 .scroll-loading{text-align:center;padding:20px;color:#9aae80;font-size:13px;font-style:italic;display:none}
 
+/* Card image & camera button */
+.card-img{display:none;width:100%;height:130px;object-fit:cover;flex-shrink:0}
+.card-img.loaded{display:block}
+.card-cam-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.5);font-size:12px;cursor:pointer;backdrop-filter:blur(2px);transition:background .15s,opacity .15s;opacity:0;line-height:1;flex-shrink:0}
+.card:hover .card-cam-btn{opacity:1}
+.card-cam-btn.has-img{opacity:.65;background:rgba(138,158,96,.4);border-color:rgba(138,158,96,.6)}
+.card:hover .card-cam-btn.has-img{opacity:1}
+
+/* Image upload modal */
+.img-modal-backdrop{display:none;position:fixed;inset:0;z-index:400;background:rgba(20,30,12,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:24px}
+.img-modal-backdrop.open{display:flex}
+.img-modal{background:#fff;border:1px solid #d0ddb8;border-radius:16px;max-width:400px;width:100%;box-shadow:0 24px 64px rgba(40,55,25,.28);overflow:hidden;animation:modalIn .18s ease}
+.img-modal-header{padding:13px 16px 11px;border-bottom:1px solid #edf0e8}
+.img-modal-title{font-size:14px;font-weight:600;color:#2a3a18;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.img-modal-sub{font-size:10px;color:#9aae80;margin-top:1px;font-style:italic}
+.img-modal-body{padding:13px 16px 10px}
+.img-lbl{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:#9aae80;margin-bottom:4px;font-weight:600}
+.img-input{width:100%;font-size:13px;padding:0 10px;height:34px;border:1px solid #c0cfa0;border-radius:8px;background:#fafaf6;color:#3a4a28;outline:none;font-family:Georgia,serif;box-sizing:border-box;transition:border-color .15s}
+.img-input:focus{border-color:#8a9e60;box-shadow:0 0 0 3px rgba(120,150,80,.12)}
+.img-btn{font-size:12px;padding:0 14px;height:34px;border:none;border-radius:8px;background:#8a9e60;color:#fff;cursor:pointer;font-family:Georgia,serif;white-space:nowrap;transition:background .15s;flex-shrink:0}
+.img-btn:hover{background:#6a8040}
+.img-btn:disabled{opacity:.45;cursor:default;pointer-events:none}
+.img-btn-sm{font-size:11px;padding:4px 10px;border:1px solid #c0cfa0;border-radius:6px;background:#f4f7ee;color:#3a4a28;cursor:pointer;font-family:Georgia,serif;transition:background .15s,border-color .15s}
+.img-btn-sm:hover{background:#e8eed8;border-color:#8a9e60}
+.img-status{font-size:11px;font-style:italic;min-height:16px;margin-top:6px;transition:color .15s}
+.img-preview-el{width:100%;max-height:190px;object-fit:contain;border-radius:8px;background:#f4f7ee;border:1px solid #e8eedd;display:none;margin-top:10px}
+.img-preview-el.loaded{display:block}
+.img-cur-el{width:100%;max-height:190px;object-fit:contain;border-radius:8px;border:1px solid #e8eedd;display:block;margin-bottom:8px}
+
 /* Compact modal stat rows */
 .ms-row{margin-bottom:10px}
 .ms-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#aab890;font-weight:600;margin-bottom:4px}
@@ -268,6 +297,18 @@ canvas{width:100%!important;display:block}
 [data-theme="dark"] .ms-score-num{color:#bccca0}
 [data-theme="dark"] .ms-score-pct{color:#7a9060}
 [data-theme="dark"] .ms-score-bar-bg{background:#2a3620}
+[data-theme="dark"] .card-cam-btn{background:rgba(0,0,0,.4);border-color:rgba(255,255,255,.15)}
+[data-theme="dark"] .img-modal{background:#1d2516;border-color:#2a3620}
+[data-theme="dark"] .img-modal-header{border-bottom-color:#2a3620}
+[data-theme="dark"] .img-modal-title{color:#d8e8b8}
+[data-theme="dark"] .img-modal-sub{color:#506040}
+[data-theme="dark"] .img-lbl{color:#506040}
+[data-theme="dark"] .img-input{background:#191e11;border-color:#3a4828;color:#bccca0}
+[data-theme="dark"] .img-input:focus{border-color:#9ab070;box-shadow:0 0 0 3px rgba(154,176,112,.18)}
+[data-theme="dark"] .img-btn-sm{background:#232c1a;border-color:#3a4828;color:#bccca0}
+[data-theme="dark"] .img-btn-sm:hover{background:#2a3620;border-color:#9ab070}
+[data-theme="dark"] .img-preview-el,[data-theme="dark"] .img-cur-el{background:#232c1a;border-color:#2a3620}
+[data-theme="dark"] .img-status{color:#7a9060}
 </style>
 </head>
 <body>
@@ -379,6 +420,33 @@ canvas{width:100%!important;display:block}
   </div>
 </div>
 
+<!-- Image upload modal -->
+<div class="img-modal-backdrop" id="img-modal-backdrop" onclick="closeImgModal(event)">
+  <div class="img-modal">
+    <div class="img-modal-header">
+      <div class="img-modal-title" id="img-modal-title"></div>
+      <div class="img-modal-sub">Image stored locally in your browser</div>
+    </div>
+    <div class="img-modal-body">
+      <div id="img-cur-section" style="display:none;margin-bottom:12px">
+        <img class="img-cur-el" id="img-cur-el" alt="">
+        <button class="img-btn-sm" onclick="removeStoredImage()">Remove image</button>
+      </div>
+      <div class="img-lbl">Image URL</div>
+      <div style="display:flex;gap:6px;margin-bottom:4px">
+        <input type="text" id="img-url-input" class="img-input" placeholder="https://example.com/photo.jpg"/>
+        <button class="img-btn" onclick="previewImgUrl()">Preview</button>
+      </div>
+      <img class="img-preview-el" id="img-preview-el" alt="">
+      <button class="img-btn" id="img-save-btn" style="width:100%;margin-top:10px;display:none" onclick="saveImgAsWebp()">Save as WebP</button>
+      <div class="img-status" id="img-status"></div>
+    </div>
+    <div style="padding:0 16px 16px">
+      <button class="img-btn-sm" style="width:100%" onclick="closeImgModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Actor modal (stacks above film modal) -->
 <div class="actor-modal-backdrop" id="actor-modal-backdrop" onclick="closeActorModal(event)">
   <div class="actor-modal" id="actor-modal">
@@ -414,6 +482,8 @@ let _modalIdx = -1;
 let _chartsInst = {};
 let _actors = [];
 let _currentPage = 'list';
+let _imgCache = null;
+let _currentImgKey = null;
 
 // ── Theme ──
 function toggleTheme() {
@@ -615,18 +685,20 @@ function af() {
 
 // ── Build card HTML ──
 function cardHTML(m, idx) {
-  const fsNorm   = normFS(m.filmScore);
-  const rc       = rClass(m.rating);
-  const sc       = starsColor(rc);
-  const tagPills = m.tags.slice(0,4).map(t => `<span class="pill">${esc(t)}</span>`).join('');
+  const fsNorm     = normFS(m.filmScore);
+  const rc         = rClass(m.rating);
+  const sc         = starsColor(rc);
+  const key        = imgKey(m);
+  const tagPills   = m.tags.slice(0,4).map(t => `<span class="pill">${esc(t)}</span>`).join('');
   const scenePills = m.scenes.slice(0,2).map(s => `<span class="pill pill-scene">${esc(s)}</span>`).join('');
-  const metaParts = [];
+  const metaParts  = [];
   if (m.length)   metaParts.push(m.length + ' min');
   if (m.location) metaParts.push(esc(m.location));
   const metaHtml = metaParts.join('<span class="card-meta-sep"> · </span>');
   const linkBtn  = m.titleUrl
     ? `<a class="card-link-btn" href="${esc(m.titleUrl)}" target="_blank" rel="noopener" title="Open link" onclick="event.stopPropagation()">↗</a>`
     : '';
+  const camBtn = `<button class="card-cam-btn" onclick="event.stopPropagation();openImgModal(${JSON.stringify(key)})" title="Set image">⊕</button>`;
   const footerParts = [];
   if (m.watch)  footerParts.push(m.watch + ' watch' + (m.watch !== 1 ? 'es' : ''));
   if (m.date)   footerParts.push(m.date);
@@ -641,9 +713,11 @@ function cardHTML(m, idx) {
       <div style="display:flex;align-items:center;gap:4px">
         ${m.type ? `<span class="card-type-pill">${esc(m.type)}</span>` : ''}
         ${linkBtn}
+        ${camBtn}
       </div>
     </div>
   </div>
+  <img class="card-img" data-imgkey="${esc(key)}" alt="">
   <div class="card-body">
     <div class="card-title">${esc(m.title)}</div>
     ${m.name ? `<div class="card-meta">${esc(m.name)}</div>` : ''}
@@ -690,6 +764,7 @@ function appendBatch() {
   grid.appendChild(frag);
   _rendered += batch.length;
   document.getElementById('scroll-loading').style.display = _rendered < fil.length ? 'block' : 'none';
+  applyStoredImages();
 }
 
 // ── Infinite scroll observer ──
@@ -706,6 +781,151 @@ function updateStats() {
     `<div class="stat"><b>${fil.length}</b> Films</div>` +
     `<div class="stat"><b>${avgRating}</b> Avg Rating</div>` +
     `<div class="stat"><b>${avgFS.toLocaleString()}</b> Avg Film Score</div>`;
+}
+
+// ── Image storage (IndexedDB) ──
+const _IMG_DB = 'movdb-images', _IMG_STORE = 'images';
+let _idb = null;
+
+function imgKey(m) { return m.code || m.title; }
+
+async function _openIdb() {
+  if (_idb) return _idb;
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(_IMG_DB, 1);
+    r.onupgradeneeded = e => e.target.result.createObjectStore(_IMG_STORE);
+    r.onsuccess = e => { _idb = e.target.result; res(_idb); };
+    r.onerror   = e => rej(e.target.error);
+  });
+}
+async function imgSave(key, dataUrl) {
+  const db = await _openIdb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(_IMG_STORE, 'readwrite');
+    tx.objectStore(_IMG_STORE).put(dataUrl, key);
+    tx.oncomplete = res; tx.onerror = e => rej(e.target.error);
+  });
+}
+async function imgDelete(key) {
+  const db = await _openIdb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(_IMG_STORE, 'readwrite');
+    tx.objectStore(_IMG_STORE).delete(key);
+    tx.oncomplete = res; tx.onerror = e => rej(e.target.error);
+  });
+}
+async function imgLoadAll() {
+  const db = await _openIdb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(_IMG_STORE, 'readonly');
+    const store = tx.objectStore(_IMG_STORE);
+    let keys = null, vals = null;
+    const done = () => { if (keys && vals) { const m={}; keys.forEach((k,i)=>m[k]=vals[i]); res(m); } };
+    store.getAllKeys().onsuccess = e => { keys = e.target.result; done(); };
+    store.getAll().onsuccess    = e => { vals = e.target.result; done(); };
+    tx.onerror = e => rej(e.target.error);
+  });
+}
+
+async function applyStoredImages() {
+  if (!_imgCache) _imgCache = await imgLoadAll();
+  document.querySelectorAll('.card-img').forEach(el => {
+    if (el.classList.contains('loaded')) return;
+    const key = el.dataset.imgkey;
+    if (key && _imgCache[key]) {
+      el.src = _imgCache[key];
+      el.classList.add('loaded');
+      const btn = el.closest('.card')?.querySelector('.card-cam-btn');
+      if (btn) btn.classList.add('has-img');
+    }
+  });
+}
+
+// ── Image modal ──
+function _imgStatus(msg, err) {
+  const el = document.getElementById('img-status');
+  el.textContent = msg;
+  el.style.color = err ? '#a05050' : '';
+}
+
+async function openImgModal(key) {
+  _currentImgKey = key;
+  if (!_imgCache) _imgCache = await imgLoadAll();
+  const m = D.find(m => imgKey(m) === key);
+  document.getElementById('img-modal-title').textContent = m ? m.title : key;
+  document.getElementById('img-url-input').value = '';
+  document.getElementById('img-save-btn').style.display = 'none';
+  const prev = document.getElementById('img-preview-el');
+  prev.classList.remove('loaded'); prev.src = '';
+  _imgStatus('');
+  const cur = document.getElementById('img-cur-section');
+  if (_imgCache[key]) {
+    document.getElementById('img-cur-el').src = _imgCache[key];
+    cur.style.display = 'block';
+  } else {
+    cur.style.display = 'none';
+  }
+  document.getElementById('img-modal-backdrop').classList.add('open');
+}
+
+function closeImgModal(e) {
+  if (e && e.target !== document.getElementById('img-modal-backdrop')) return;
+  document.getElementById('img-modal-backdrop').classList.remove('open');
+}
+
+function previewImgUrl() {
+  const url = document.getElementById('img-url-input').value.trim();
+  if (!url) return;
+  const img = document.getElementById('img-preview-el');
+  img.classList.remove('loaded');
+  document.getElementById('img-save-btn').style.display = 'none';
+  _imgStatus('Loading…');
+  img.onload = () => {
+    img.classList.add('loaded');
+    document.getElementById('img-save-btn').style.display = 'block';
+    _imgStatus('');
+  };
+  img.onerror = () => _imgStatus('Could not load image — check the URL or try another.', true);
+  img.src = '/api/image?url=' + encodeURIComponent(url);
+}
+
+async function saveImgAsWebp() {
+  const img = document.getElementById('img-preview-el');
+  if (!img.naturalWidth) { _imgStatus('Load a preview first.', true); return; }
+  _imgStatus('Converting to WebP…');
+  try {
+    const MAX = 960;
+    const scale  = Math.min(1, MAX / Math.max(img.naturalWidth, img.naturalHeight));
+    const canvas = document.createElement('canvas');
+    canvas.width  = Math.round(img.naturalWidth  * scale);
+    canvas.height = Math.round(img.naturalHeight * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    const fmt     = canvas.toDataURL('image/webp', 0.01).startsWith('data:image/webp') ? 'image/webp' : 'image/jpeg';
+    const dataUrl = canvas.toDataURL(fmt, 0.85);
+    await imgSave(_currentImgKey, dataUrl);
+    if (!_imgCache) _imgCache = {};
+    _imgCache[_currentImgKey] = dataUrl;
+    applyStoredImages();
+    document.getElementById('img-cur-el').src = dataUrl;
+    document.getElementById('img-cur-section').style.display = 'block';
+    _imgStatus('Saved' + (fmt === 'image/webp' ? ' as WebP' : ' as JPEG') + '  (' + Math.round(dataUrl.length * 0.75 / 1024) + ' KB)');
+  } catch(err) {
+    _imgStatus('Error: ' + err.message, true);
+  }
+}
+
+async function removeStoredImage() {
+  if (!_currentImgKey) return;
+  await imgDelete(_currentImgKey);
+  delete _imgCache[_currentImgKey];
+  document.querySelectorAll('.card-img.loaded').forEach(el => {
+    if (el.dataset.imgkey !== _currentImgKey) return;
+    el.classList.remove('loaded'); el.src = '';
+    const btn = el.closest('.card')?.querySelector('.card-cam-btn');
+    if (btn) btn.classList.remove('has-img');
+  });
+  document.getElementById('img-cur-section').style.display = 'none';
+  _imgStatus('Image removed.');
 }
 
 // ── Shared chip helper ──
@@ -854,7 +1074,8 @@ function closeActorModal(e) {
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    if (document.getElementById('actor-modal-backdrop').classList.contains('open')) closeActorModal();
+    if (document.getElementById('img-modal-backdrop').classList.contains('open'))   closeImgModal();
+    else if (document.getElementById('actor-modal-backdrop').classList.contains('open')) closeActorModal();
     else closeModal();
   }
 });
