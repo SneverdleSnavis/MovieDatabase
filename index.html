@@ -155,6 +155,20 @@ canvas{width:100%!important;display:block}
 #scroll-sentinel{height:1px;margin-top:24px}
 .scroll-loading{text-align:center;padding:20px;color:#9aae80;font-size:13px;font-style:italic;display:none}
 
+/* Compact modal stat rows */
+.ms-row{margin-bottom:10px}
+.ms-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#aab890;font-weight:600;margin-bottom:4px}
+.ms-chips{display:flex;gap:4px;flex-wrap:wrap}
+.ms-chip{background:#f4f7ee;border:1px solid #dde8c8;border-radius:6px;padding:4px 8px;min-width:0}
+.ms-chip-lbl{font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:#aab890;line-height:1.3}
+.ms-chip-val{font-size:12px;color:#3a4a28;font-weight:500;line-height:1.3}
+.ms-score{background:#f0f5e8;border:1px solid #c8d5b0;border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:12px}
+.ms-score-num{font-size:20px;font-weight:700;color:#3a4a28;font-family:Georgia,serif;line-height:1;flex-shrink:0}
+.ms-score-right{flex:1;display:flex;flex-direction:column;gap:3px}
+.ms-score-pct{font-size:10px;color:#7a8c60;font-weight:600}
+.ms-score-bar-bg{height:4px;background:#dde8c8;border-radius:2px;overflow:hidden}
+.ms-score-bar{height:100%;background:#8a9e60;border-radius:2px}
+
 /* ── Dark mode ── */
 [data-theme="dark"]{color-scheme:dark}
 [data-theme="dark"] body{background:#141a0c;color:#bccca0}
@@ -247,6 +261,13 @@ canvas{width:100%!important;display:block}
 [data-theme="dark"] .actor-modal-sub{color:#7a9060}
 [data-theme="dark"] .actor-modal-close{background:#232c1a;border-color:#3a4828;color:#bccca0}
 [data-theme="dark"] .actor-modal-close:hover{background:#2a3620}
+[data-theme="dark"] .ms-chip{background:#232c1a;border-color:#2a3620}
+[data-theme="dark"] .ms-chip-lbl{color:#506040}
+[data-theme="dark"] .ms-chip-val{color:#bccca0}
+[data-theme="dark"] .ms-score{background:#1a2312;border-color:#2a3620}
+[data-theme="dark"] .ms-score-num{color:#bccca0}
+[data-theme="dark"] .ms-score-pct{color:#7a9060}
+[data-theme="dark"] .ms-score-bar-bg{background:#2a3620}
 </style>
 </head>
 <body>
@@ -481,14 +502,14 @@ function processCSV(text) {
       actorScore: pInt(g(row, 'Actor Score')),
       name:       g(row, 'Name'),
       actorType:  ACTOR_TYPE_COL >= 0 ? (row[ACTOR_TYPE_COL] || '').trim() : '',
-      front:      pInt(g(row, 'Front')),
-      back:       pInt(g(row, 'Back')),
-      overall:    pInt(g(row, 'Overall')),
-      face:       pInt(g(row, 'Face')),
+      front:      g(row, 'Front'),
+      back:       g(row, 'Back'),
+      overall:    g(row, 'Overall'),
+      face:       g(row, 'Face'),
       form:       g(row, 'Form'),
       view:       g(row, 'View'),
       blocked:    g(row, 'Blocked'),
-      pacing:     pInt(g(row, 'Pacing')),
+      pacing:     g(row, 'Pacing'),
       tags:       (g(row, 'Tags') || '').split(',').map(s => s.trim()).filter(Boolean),
     });
   }
@@ -687,6 +708,12 @@ function updateStats() {
     `<div class="stat"><b>${avgFS.toLocaleString()}</b> Avg Film Score</div>`;
 }
 
+// ── Shared chip helper ──
+function chip(lbl, val) {
+  if (val === '' || val === null || val === undefined) return '';
+  return `<div class="ms-chip"><div class="ms-chip-lbl">${lbl}</div><div class="ms-chip-val">${esc(String(val))}</div></div>`;
+}
+
 // ── Film Modal ──
 function openModal(idx) {
   _modalIdx = idx;
@@ -695,73 +722,81 @@ function openModal(idx) {
   const rc     = rClass(m.rating);
   const sc     = starsColor(rc);
   const fsNorm = normFS(m.filmScore);
-
-  const scenesHtml = m.scenes.map(s => `<span class="modal-pill" style="background:#eef0f8;border-color:#c8ccdc;color:#6a7a9a">${esc(s)}</span>`).join('');
-
-  // Film Features: View, Blocked, Pacing, Tags
-  const hasFeatures = m.view || m.blocked || m.pacing || m.tags.length;
-  const tagsHtml = m.tags.map(t => `<span class="modal-pill">${esc(t)}</span>`).join('');
-  const featuresSection = hasFeatures ? `
-    <div class="modal-section-head">Film Features</div>
-    ${m.view    ? `<div><div class="modal-label">View</div><div class="modal-value">${esc(m.view)}</div></div>` : ''}
-    ${m.blocked ? `<div><div class="modal-label">Blocked</div><div class="modal-value">${esc(m.blocked)}</div></div>` : ''}
-    ${m.pacing  ? `<div><div class="modal-label">Pacing</div><div class="modal-value">${m.pacing}</div></div>` : ''}
-    ${tagsHtml  ? `<div class="modal-full" style="margin-top:2px">${tagsHtml}</div>` : ''}` : '';
-
-  // Actor Info: Actor Score, Name, Type, Front, Back, Overall, Face, Form
-  const hasActor = m.actorScore || m.name || m.actorType || m.front || m.back || m.overall || m.face || m.form;
   const asNorm = normAS(m.actorScore);
-  const actorSection = hasActor ? `
-    <div class="modal-section-head" style="display:flex;justify-content:space-between;align-items:center">
-      <span>Actor Info</span>
-      <button onclick="openActorModal(${idx})" style="font-size:11px;padding:2px 10px;border:1px solid #c0cfa0;border-radius:6px;background:#f4f7ee;color:#3a4a28;cursor:pointer;font-family:Georgia,serif;transition:background .15s" onmouseover="this.style.background='#e8eed8'" onmouseout="this.style.background='#f4f7ee'">Actor details →</button>
-    </div>
-    <div>
-      <div class="modal-label">Actor Score</div>
-      <div class="modal-value" style="font-size:18px;font-weight:700">${m.actorScore.toLocaleString()}</div>
-      <div class="score-bar-wrap"><div class="score-bar" style="width:${asNorm}%"></div></div>
-      <div style="font-size:10px;color:#9aae80;margin-top:2px">${asNorm}% of max</div>
-    </div>
-    ${m.name     ? `<div><div class="modal-label">Name</div><div class="modal-value">${esc(m.name)}</div></div>` : ''}
-    ${m.actorType? `<div><div class="modal-label">Type</div><div class="modal-value">${esc(m.actorType)}</div></div>` : ''}
-    ${m.front    ? `<div><div class="modal-label">Front</div><div class="modal-value">${m.front}</div></div>` : ''}
-    ${m.back     ? `<div><div class="modal-label">Back</div><div class="modal-value">${m.back}</div></div>` : ''}
-    ${m.overall  ? `<div><div class="modal-label">Overall</div><div class="modal-value">${m.overall}</div></div>` : ''}
-    ${m.face     ? `<div><div class="modal-label">Face</div><div class="modal-value">${m.face}</div></div>` : ''}
-    ${m.form     ? `<div><div class="modal-label">Form</div><div class="modal-value">${esc(m.form)}</div></div>` : ''}` : '';
+
+  const filmChips = [
+    m.rating   ? chip('Rating', stars(m.rating)) : '',
+    chip('Type', m.type),
+    chip('Code', m.code),
+    m.length   ? chip('Length', m.length + ' min') : '',
+    m.watch != null ? chip('Watches', m.watch) : '',
+    chip('Date', m.date),
+    chip('Location', m.location),
+    m.scenes.length ? chip('Scenes', m.scenes.join(', ')) : '',
+  ].join('');
+
+  const featChips = [
+    chip('View', m.view),
+    chip('Blocked', m.blocked),
+    chip('Pacing', m.pacing),
+  ].join('');
+
+  const tagsRow = m.tags.length
+    ? `<div class="ms-row"><div class="ms-lbl">Tags</div><div class="ms-chips">${m.tags.map(t => `<span class="modal-pill">${esc(t)}</span>`).join('')}</div></div>`
+    : '';
+
+  const hasActor = m.actorScore || m.name || m.actorType || m.front || m.back || m.overall || m.face || m.form;
+  const actorChips = [
+    chip('Name', m.name),
+    chip('Type', m.actorType),
+    chip('Front', m.front),
+    chip('Back', m.back),
+    chip('Overall', m.overall),
+    chip('Face', m.face),
+    chip('Form', m.form),
+  ].join('');
 
   document.getElementById('modal-inner').innerHTML = `
-<div class="modal-score-header ${rc}">
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+<div class="modal-score-header ${rc}" style="padding:14px 16px 12px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
     <div style="min-width:0">
-      <div class="modal-title">${esc(m.title)}</div>
-      ${m.code ? `<div style="font-size:11px;color:#9aae80;margin-top:1px;font-style:italic">${esc(m.code)}</div>` : ''}
+      <div class="modal-title" style="font-size:18px">${esc(m.title)}</div>
+      ${m.code ? `<div style="font-size:10px;color:#9aae80;margin-top:1px;font-style:italic">${esc(m.code)}</div>` : ''}
     </div>
-    <div style="text-align:right;flex-shrink:0">
-      ${m.rating ? `<div class="rating-stars-lg" style="color:${sc}">${stars(m.rating)}</div>` : ''}
-      ${m.type ? `<div style="margin-top:4px"><span class="modal-pill">${esc(m.type)}</span></div>` : ''}
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+      ${m.rating ? `<span style="color:${sc};font-size:14px;letter-spacing:1px">${stars(m.rating)}</span>` : ''}
+      ${m.titleUrl ? `<a class="card-link-btn" href="${esc(m.titleUrl)}" target="_blank" rel="noopener" title="Open link">↗</a>` : ''}
     </div>
   </div>
-  ${scenesHtml ? `<div class="modal-pills" style="margin-top:10px">${scenesHtml}</div>` : ''}
 </div>
-<div class="modal-body">
-  ${m.titleUrl ? `<a class="modal-link-btn" href="${esc(m.titleUrl)}" target="_blank" rel="noopener">↗ Open link</a>` : ''}
-  <div class="modal-grid" style="margin-top:${m.titleUrl ? '14px' : '0'}">
-    <div>
-      <div class="modal-label">Film Score</div>
-      <div class="modal-value" style="font-size:20px;font-weight:700">${m.filmScore.toLocaleString()}</div>
-      <div class="score-bar-wrap"><div class="score-bar" style="width:${fsNorm}%"></div></div>
-      <div style="font-size:10px;color:#9aae80;margin-top:2px">${fsNorm}% of max</div>
+<div style="padding:12px 16px 4px">
+  <div class="ms-row">
+    <div class="ms-lbl">Film Score</div>
+    <div class="ms-score">
+      <div class="ms-score-num">${m.filmScore.toLocaleString()}</div>
+      <div class="ms-score-right">
+        <div class="ms-score-pct">${fsNorm}% of max</div>
+        <div class="ms-score-bar-bg"><div class="ms-score-bar" style="width:${fsNorm}%"></div></div>
+      </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:6px">
-      ${m.length   ? `<div><div class="modal-label">Length</div><div class="modal-value">${m.length} min</div></div>` : ''}
-      ${m.watch!=null ? `<div><div class="modal-label">Watches</div><div class="modal-value">${m.watch||0}</div></div>` : ''}
-      ${m.date     ? `<div><div class="modal-label">Date</div><div class="modal-value">${esc(m.date)}</div></div>` : ''}
-      ${m.location ? `<div><div class="modal-label">Location</div><div class="modal-value">${esc(m.location)}</div></div>` : ''}
-    </div>
-    ${featuresSection}
-    ${actorSection}
   </div>
+  ${filmChips ? `<div class="ms-row"><div class="ms-lbl">Film Details</div><div class="ms-chips">${filmChips}</div></div>` : ''}
+  ${featChips ? `<div class="ms-row"><div class="ms-lbl">Features</div><div class="ms-chips">${featChips}</div></div>` : ''}
+  ${tagsRow}
+  ${hasActor ? `<div class="ms-row">
+    <div class="ms-lbl" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Actor Score</span>
+      <button onclick="openActorModal(${idx})" style="font-size:10px;padding:1px 8px;border:1px solid #c0cfa0;border-radius:5px;background:#f4f7ee;color:#3a4a28;cursor:pointer;font-family:Georgia,serif;text-transform:none;letter-spacing:0">details →</button>
+    </div>
+    <div class="ms-score">
+      <div class="ms-score-num">${m.actorScore.toLocaleString()}</div>
+      <div class="ms-score-right">
+        <div class="ms-score-pct">${asNorm}% of max</div>
+        <div class="ms-score-bar-bg"><div class="ms-score-bar" style="width:${asNorm}%"></div></div>
+      </div>
+    </div>
+  </div>` : ''}
+  ${actorChips ? `<div class="ms-row"><div class="ms-lbl">Actor Details</div><div class="ms-chips">${actorChips}</div></div>` : ''}
 </div>`;
 
   document.getElementById('modal-backdrop').classList.add('open');
@@ -782,25 +817,31 @@ function openActorModal(idx) {
   const asNorm = normAS(m.actorScore);
   const rc     = rClass(m.rating);
 
+  const actorChips = [
+    chip('Front', m.front),
+    chip('Back', m.back),
+    chip('Overall', m.overall),
+    chip('Face', m.face),
+    chip('Form', m.form),
+  ].join('');
+
   document.getElementById('actor-modal-inner').innerHTML = `
 <div class="actor-modal-header ${rc}">
   <div class="actor-modal-title">${esc(m.name || 'Actor')}</div>
   ${m.actorType ? `<div class="actor-modal-sub">${esc(m.actorType)}</div>` : ''}
 </div>
 <div class="actor-modal-body">
-  <div style="margin-bottom:14px">
-    <div class="modal-label">Actor Score</div>
-    <div class="modal-value" style="font-size:22px;font-weight:700">${m.actorScore.toLocaleString()}</div>
-    <div class="score-bar-wrap"><div class="score-bar" style="width:${asNorm}%"></div></div>
-    <div style="font-size:10px;color:#9aae80;margin-top:2px">${asNorm}% of max</div>
+  <div class="ms-row">
+    <div class="ms-lbl">Actor Score</div>
+    <div class="ms-score">
+      <div class="ms-score-num">${m.actorScore.toLocaleString()}</div>
+      <div class="ms-score-right">
+        <div class="ms-score-pct">${asNorm}% of max</div>
+        <div class="ms-score-bar-bg"><div class="ms-score-bar" style="width:${asNorm}%"></div></div>
+      </div>
+    </div>
   </div>
-  <div class="actor-modal-grid">
-    ${m.front   ? `<div><div class="modal-label">Front</div><div class="modal-value">${m.front}</div></div>` : ''}
-    ${m.back    ? `<div><div class="modal-label">Back</div><div class="modal-value">${m.back}</div></div>` : ''}
-    ${m.overall ? `<div><div class="modal-label">Overall</div><div class="modal-value">${m.overall}</div></div>` : ''}
-    ${m.face    ? `<div><div class="modal-label">Face</div><div class="modal-value">${m.face}</div></div>` : ''}
-    ${m.form    ? `<div class="modal-full"><div class="modal-label">Form</div><div class="modal-value">${esc(m.form)}</div></div>` : ''}
-  </div>
+  ${actorChips ? `<div class="ms-row"><div class="ms-lbl">Actor Details</div><div class="ms-chips">${actorChips}</div></div>` : ''}
 </div>`;
 
   document.getElementById('actor-modal-backdrop').classList.add('open');
