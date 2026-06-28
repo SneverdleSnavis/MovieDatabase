@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   const { gid } = req.query;
-  const SHEET_ID = 'TODO_REPLACE_WITH_YOUR_SHEET_ID';
+  const SHEET_ID = '1y_aLrrbqDBjZ9mDht1jBZN-sXGqq44Yxv3JDREhgdnA';
 
   const ALLOWED_GIDS = ['0']; // Add your sheet tab gids here
   if (!ALLOWED_GIDS.includes(gid)) {
