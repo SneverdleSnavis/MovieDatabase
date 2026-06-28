@@ -378,6 +378,19 @@ canvas{width:100%!important;display:block}
         <option value="score">Avg film score</option>
         <option value="name">Name A–Z</option>
       </select>
+      <button class="filter-toggle-btn" id="actor-filter-btn" onclick="toggleActorFilterPanel()">⚙ Filters</button>
+      <button class="reset-btn" id="actor-reset-btn" onclick="resetActorFilters()">✕ Reset</button>
+    </div>
+    <div class="filter-panel" id="actor-filter-panel">
+      <div class="filter-grid">
+        <div class="filter-item filter-select"><label>Actor Type</label><select id="af-type"><option value="">All types</option></select></div>
+        <div class="filter-item filter-select"><label>Form</label><select id="af-form"><option value="">All forms</option></select></div>
+        <div class="filter-item filter-select"><label>View</label><select id="af-view"><option value="">All views</option></select></div>
+        <div class="filter-item filter-select"><label>Blocked</label><select id="af-blocked"><option value="">Any</option></select></div>
+        <div class="filter-item"><label>Min Actor Score %</label><input type="number" id="af-asmin" class="filter-num" placeholder="0" min="0" max="100"/></div>
+        <div class="filter-item"><label>Max Actor Score %</label><input type="number" id="af-asmax" class="filter-num" placeholder="" min="0" max="100"/></div>
+        <div class="filter-item"><label>Min Films</label><input type="number" id="af-films" class="filter-num" placeholder="1" min="1"/></div>
+      </div>
     </div>
   </div>
 </header>
@@ -626,6 +639,31 @@ function populateFilters() {
   fill('fform',   [...new Set(D.map(m => m.form).filter(Boolean))].sort(), 'All forms');
   fill('fview',   [...new Set(D.map(m => m.view).filter(Boolean))].sort(), 'All views');
   fill('fblocked',[...new Set(D.map(m => m.blocked).filter(Boolean))].sort(), 'Any');
+}
+
+function populateActorFilters() {
+  function fill(id, opts, first) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = `<option value="">${first}</option>`;
+    opts.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; el.appendChild(o); });
+  }
+  fill('af-type',    [...new Set(D.map(m => m.actorType).filter(Boolean))].sort(), 'All types');
+  fill('af-form',    [...new Set(D.map(m => m.form).filter(Boolean))].sort(),      'All forms');
+  fill('af-view',    [...new Set(D.map(m => m.view).filter(Boolean))].sort(),      'All views');
+  fill('af-blocked', [...new Set(D.map(m => m.blocked).filter(Boolean))].sort(),   'Any');
+}
+
+function toggleActorFilterPanel() {
+  const panel = document.getElementById('actor-filter-panel');
+  const btn   = document.getElementById('actor-filter-btn');
+  btn.classList.toggle('open', panel.classList.toggle('open'));
+}
+
+function resetActorFilters() {
+  ['actor-qs','af-asmin','af-asmax','af-films'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['af-type','af-form','af-view','af-blocked'].forEach(id => { const el=document.getElementById(id); if(el) el.selectedIndex=0; });
+  renderActorsPage();
 }
 
 // ── Filter & sort ──
@@ -1194,10 +1232,33 @@ function buildActors() {
 }
 
 function renderActorsPage() {
-  const q  = (document.getElementById('actor-qs').value  || '').toLowerCase();
-  const sb = document.getElementById('actor-sb').value;
+  const q         = (document.getElementById('actor-qs').value || '').toLowerCase();
+  const sb        = document.getElementById('actor-sb').value;
+  const aftype    = document.getElementById('af-type')?.value    || '';
+  const afform    = document.getElementById('af-form')?.value    || '';
+  const afview    = document.getElementById('af-view')?.value    || '';
+  const afblocked = document.getElementById('af-blocked')?.value || '';
+  const afasmin   = parseInt(document.getElementById('af-asmin')?.value) || 0;
+  const afasmax   = parseInt(document.getElementById('af-asmax')?.value) || 0;
+  const affilms   = parseInt(document.getElementById('af-films')?.value) || 0;
 
-  let actors = _actors.filter(a => !q || a.name.toLowerCase().includes(q));
+  const hasFilters = aftype||afform||afview||afblocked||afasmin||afasmax||affilms;
+  if (document.getElementById('actor-filter-btn')) {
+    document.getElementById('actor-filter-btn').classList.toggle('has-filters', !!hasFilters);
+    document.getElementById('actor-reset-btn').classList.toggle('active', !!(hasFilters || q));
+  }
+
+  let actors = _actors.filter(a => {
+    if (q         && !a.name.toLowerCase().includes(q))                         return false;
+    if (aftype    && !a.movies.some(m => m.actorType === aftype))               return false;
+    if (afform    && !a.movies.some(m => m.form    === afform))                 return false;
+    if (afview    && !a.movies.some(m => m.view    === afview))                 return false;
+    if (afblocked && !a.movies.some(m => m.blocked === afblocked))              return false;
+    if (afasmin   && normAS(avgAS(a)) < afasmin)                                return false;
+    if (afasmax   && normAS(avgAS(a)) > afasmax)                                return false;
+    if (affilms   && a.movies.length  < affilms)                                return false;
+    return true;
+  });
 
   const avgAS = a => a.movies.reduce((s,m) => s+m.actorScore, 0) / a.movies.length;
   actors.sort((a, b) => {
@@ -1332,7 +1393,7 @@ ELEM_IDS.forEach(id => {
   const el = document.getElementById(id);
   if (el) { el.addEventListener('input', af); el.addEventListener('change', af); }
 });
-['actor-qs','actor-sb'].forEach(id => {
+['actor-qs','actor-sb','af-type','af-form','af-view','af-blocked','af-asmin','af-asmax','af-films'].forEach(id => {
   const el = document.getElementById(id);
   if (el) { el.addEventListener('input', renderActorsPage); el.addEventListener('change', renderActorsPage); }
 });
@@ -1354,6 +1415,7 @@ async function bootstrap() {
     loader.style.display = 'none';
     _scrollObs.observe(document.getElementById('scroll-sentinel'));
     populateFilters();
+    populateActorFilters();
     loadURLState();
     const hash = location.hash.replace('#','');
     if (hash === 'stats')  gotoPage('stats');
