@@ -185,6 +185,25 @@ canvas{width:100%!important;display:block}
 .img-preview-el.loaded{display:block}
 .img-cur-el{width:100%;max-height:190px;object-fit:contain;border-radius:8px;border:1px solid #e8eedd;display:block;margin-bottom:8px}
 
+/* Multi-select dropdown */
+.ms-sel{position:relative;display:inline-block}
+.ms-sel-btn{font-size:13px;padding:0 10px;height:36px;border:1px solid #c0cfa0;border-radius:8px;background:#fafaf6;color:#3a4a28;cursor:pointer;font-family:Georgia,serif;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:border-color .15s,background .15s}
+.ms-sel-btn:hover,.ms-sel-btn.open{border-color:#8a9e60;background:#fff}
+.ms-sel-btn.has-val{border-color:#8a9e60;background:#f0f5e8;font-weight:600;color:#4a6a28}
+.ms-sel-arrow{font-size:9px;opacity:.5;transition:transform .18s;flex-shrink:0}
+.ms-sel-btn.open .ms-sel-arrow{transform:rotate(180deg)}
+.ms-sel-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:170px;background:#fff;border:1px solid #c0cfa0;border-radius:10px;box-shadow:0 8px 24px rgba(60,80,40,.18);z-index:200;padding:4px;max-height:230px;overflow-y:auto}
+.ms-sel-panel.open{display:block}
+.ms-sel-opt{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:6px;cursor:pointer;font-size:13px;color:#3a4a28;font-family:Georgia,serif;user-select:none;transition:background .1s}
+.ms-sel-opt:hover{background:#f0f5e8}
+.ms-sel-opt input[type=checkbox]{accent-color:#8a9e60;width:14px;height:14px;flex-shrink:0;cursor:pointer;margin:0}
+[data-theme="dark"] .ms-sel-btn{background:#191e11;border-color:#3a4828;color:#bccca0}
+[data-theme="dark"] .ms-sel-btn:hover,[data-theme="dark"] .ms-sel-btn.open{background:#1d2516;border-color:#9ab070}
+[data-theme="dark"] .ms-sel-btn.has-val{background:#1a2610;color:#c8e8a0;border-color:#9ab070}
+[data-theme="dark"] .ms-sel-panel{background:#1d2516;border-color:#3a4828;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+[data-theme="dark"] .ms-sel-opt{color:#bccca0}
+[data-theme="dark"] .ms-sel-opt:hover{background:#232c1a}
+
 /* Compact modal stat rows */
 .ms-row{margin-bottom:10px}
 .ms-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#aab890;font-weight:600;margin-bottom:4px}
@@ -345,17 +364,12 @@ canvas{width:100%!important;display:block}
     </div>
     <div class="filter-panel" id="filter-panel">
       <div class="filter-grid">
-        <div class="filter-item filter-select"><label>Film Type</label><select id="ftype"><option value="">All types</option></select></div>
-        <div class="filter-item filter-select"><label>Rating</label><select id="frating">
-          <option value="">All ratings</option>
-          <option value="5">★★★★★ (5)</option><option value="4">★★★★☆ (4)</option>
-          <option value="3">★★★☆☆ (3)</option><option value="2">★★☆☆☆ (2)</option>
-          <option value="1">★☆☆☆☆ (1)</option>
-        </select></div>
-        <div class="filter-item filter-select"><label>Actor Type</label><select id="factype"><option value="">All actor types</option></select></div>
-        <div class="filter-item filter-select"><label>Form</label><select id="fform"><option value="">All forms</option></select></div>
-        <div class="filter-item filter-select"><label>View</label><select id="fview"><option value="">All views</option></select></div>
-        <div class="filter-item filter-select"><label>Blocked</label><select id="fblocked"><option value="">Any</option></select></div>
+        <div class="filter-item filter-select"><label>Film Type</label><div class="ms-sel" data-msid="ftype"><button class="ms-sel-btn" onclick="toggleMsSel('ftype')"><span id="ms-lbl-ftype">All types</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-ftype" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Rating</label><div class="ms-sel" data-msid="frating"><button class="ms-sel-btn" onclick="toggleMsSel('frating')"><span id="ms-lbl-frating">All ratings</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-frating" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Actor Type</label><div class="ms-sel" data-msid="factype"><button class="ms-sel-btn" onclick="toggleMsSel('factype')"><span id="ms-lbl-factype">All actor types</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-factype" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Form</label><div class="ms-sel" data-msid="fform"><button class="ms-sel-btn" onclick="toggleMsSel('fform')"><span id="ms-lbl-fform">All forms</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-fform" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>View</label><div class="ms-sel" data-msid="fview"><button class="ms-sel-btn" onclick="toggleMsSel('fview')"><span id="ms-lbl-fview">All views</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-fview" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Blocked</label><div class="ms-sel" data-msid="fblocked"><button class="ms-sel-btn" onclick="toggleMsSel('fblocked')"><span id="ms-lbl-fblocked">Any</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-fblocked" onclick="event.stopPropagation()"></div></div></div>
         <div class="filter-item"><label>Tag</label><input type="text" id="ftag" class="filter-select" placeholder="e.g. outdoor" style="width:130px"/></div>
         <div class="filter-item"><label>Scene</label><input type="text" id="fscene" class="filter-select" placeholder="scene name" style="width:130px"/></div>
         <div class="filter-item"><label>Actor Name</label><input type="text" id="fname" class="filter-select" placeholder="name" style="width:130px"/></div>
@@ -499,6 +513,8 @@ let _actors = [];
 let _currentPage = 'list';
 let _imgCache = null;
 let _currentImgKey = null;
+const _msel = { ftype: new Set(), frating: new Set(), factype: new Set(), fform: new Set(), fview: new Set(), fblocked: new Set() };
+const _mselDefault = { ftype:'All types', frating:'All ratings', factype:'All actor types', fform:'All forms', fview:'All views', fblocked:'Any' };
 
 // ── Theme ──
 function toggleTheme() {
@@ -624,21 +640,49 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// ── Multi-select dropdowns ──
+function toggleMsSel(id) {
+  const panel = document.getElementById('ms-panel-' + id);
+  const isOpen = panel.classList.contains('open');
+  document.querySelectorAll('.ms-sel-panel.open').forEach(p => { p.classList.remove('open'); p.closest('.ms-sel').querySelector('.ms-sel-btn').classList.remove('open'); });
+  if (!isOpen) { panel.classList.add('open'); panel.closest('.ms-sel').querySelector('.ms-sel-btn').classList.add('open'); }
+}
+function toggleMsOpt(id, val, checked) {
+  if (checked) _msel[id].add(val); else _msel[id].delete(val);
+  const s = _msel[id];
+  const lbl = document.getElementById('ms-lbl-' + id);
+  const btn = lbl?.closest('.ms-sel-btn');
+  if (lbl) lbl.textContent = s.size === 0 ? _mselDefault[id] : s.size === 1 ? [...s][0] : s.size + ' selected';
+  if (btn) btn.classList.toggle('has-val', s.size > 0);
+  af();
+}
+function clearMsSel(id) {
+  _msel[id].clear();
+  const panel = document.getElementById('ms-panel-' + id);
+  if (panel) panel.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+  const lbl = document.getElementById('ms-lbl-' + id);
+  if (lbl) { lbl.textContent = _mselDefault[id]; lbl.closest('.ms-sel-btn')?.classList.remove('has-val'); }
+}
+document.addEventListener('click', () => {
+  document.querySelectorAll('.ms-sel-panel.open').forEach(p => { p.classList.remove('open'); p.closest('.ms-sel').querySelector('.ms-sel-btn').classList.remove('open'); });
+});
+
 // ── Populate filter dropdowns ──
 function populateFilters() {
-  function fill(id, opts, first) {
-    const el = document.getElementById(id);
-    const fo = el.options[0];
-    fo.textContent = first;
-    el.innerHTML = '';
-    el.appendChild(fo);
-    opts.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; el.appendChild(o); });
+  function fillMs(id, vals) {
+    const panel = document.getElementById('ms-panel-' + id);
+    if (!panel) return;
+    panel.innerHTML = vals.map(({val, lbl}) =>
+      `<label class="ms-sel-opt"><input type="checkbox" onchange="toggleMsOpt('${id}','${val.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}',this.checked)"> ${lbl}</label>`
+    ).join('');
   }
-  fill('ftype',   [...new Set(D.map(m => m.type).filter(Boolean))].sort(), 'All types');
-  fill('factype', [...new Set(D.map(m => m.actorType).filter(Boolean))].sort(), 'All actor types');
-  fill('fform',   [...new Set(D.map(m => m.form).filter(Boolean))].sort(), 'All forms');
-  fill('fview',   [...new Set(D.map(m => m.view).filter(Boolean))].sort(), 'All views');
-  fill('fblocked',[...new Set(D.map(m => m.blocked).filter(Boolean))].sort(), 'Any');
+  const opts = arr => arr.map(v => ({val:v, lbl:v}));
+  fillMs('ftype',   opts([...new Set(D.map(m => m.type).filter(Boolean))].sort()));
+  fillMs('frating', [{val:'5',lbl:'★★★★★ (5)'},{val:'4',lbl:'★★★★☆ (4)'},{val:'3',lbl:'★★★☆☆ (3)'},{val:'2',lbl:'★★☆☆☆ (2)'},{val:'1',lbl:'★☆☆☆☆ (1)'}]);
+  fillMs('factype', opts([...new Set(D.map(m => m.actorType).filter(Boolean))].sort()));
+  fillMs('fform',   opts([...new Set(D.map(m => m.form).filter(Boolean))].sort()));
+  fillMs('fview',   opts([...new Set(D.map(m => m.view).filter(Boolean))].sort()));
+  fillMs('fblocked',opts([...new Set(D.map(m => m.blocked).filter(Boolean))].sort()));
 }
 
 function populateActorFilters() {
@@ -669,12 +713,6 @@ function resetActorFilters() {
 // ── Filter & sort ──
 function af() {
   const q      = (document.getElementById('qs').value || '').toLowerCase();
-  const ftype  = document.getElementById('ftype').value;
-  const frating= document.getElementById('frating').value;
-  const factype= document.getElementById('factype').value;
-  const fform  = document.getElementById('fform').value;
-  const fview  = document.getElementById('fview').value;
-  const fblocked=document.getElementById('fblocked').value;
   const ftag   = (document.getElementById('ftag').value || '').toLowerCase().trim();
   const fscene = (document.getElementById('fscene').value || '').toLowerCase().trim();
   const fname  = (document.getElementById('fname').value || '').toLowerCase().trim();
@@ -685,18 +723,19 @@ function af() {
   const sb     = document.getElementById('sb').value;
   const sd     = document.getElementById('sd').value;
 
-  const hasFilters = ftype||frating||factype||fform||fview||fblocked||ftag||fscene||fname||fpmin||fpmax||fwmin||fwmax;
+  const hasMsel = Object.values(_msel).some(s => s.size > 0);
+  const hasFilters = hasMsel||ftag||fscene||fname||fpmin||fpmax||fwmin||fwmax;
   document.getElementById('filter-btn').classList.toggle('has-filters', !!hasFilters);
   document.getElementById('reset-btn').classList.toggle('active', !!(hasFilters || q));
 
   fil = D.filter(m => {
     if (q && !([m.title,m.name,m.code,m.location,...m.tags,...m.scenes].join(' ').toLowerCase().includes(q))) return false;
-    if (ftype   && m.type !== ftype) return false;
-    if (frating && m.rating !== parseInt(frating)) return false;
-    if (factype && m.actorType !== factype) return false;
-    if (fform   && m.form !== fform) return false;
-    if (fview   && m.view !== fview) return false;
-    if (fblocked && m.blocked !== fblocked) return false;
+    if (_msel.ftype.size    && !_msel.ftype.has(m.type))               return false;
+    if (_msel.frating.size  && !_msel.frating.has(String(m.rating)))   return false;
+    if (_msel.factype.size  && !_msel.factype.has(m.actorType))        return false;
+    if (_msel.fform.size    && !_msel.fform.has(m.form))               return false;
+    if (_msel.fview.size    && !_msel.fview.has(m.view))               return false;
+    if (_msel.fblocked.size && !_msel.fblocked.has(m.blocked))         return false;
     if (ftag   && !m.tags.some(t  => t.toLowerCase().includes(ftag)))   return false;
     if (fscene && !m.scenes.some(s => s.toLowerCase().includes(fscene))) return false;
     if (fname  && !m.name.toLowerCase().includes(fname)) return false;
@@ -1158,7 +1197,7 @@ function toggleFilterPanel() {
 
 function resetFilters() {
   ['qs','ftag','fscene','fname','fpmin','fpmax','fwmin','fwmax'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  ['ftype','frating','factype','fform','fview','fblocked'].forEach(id => { const el=document.getElementById(id); if(el) el.selectedIndex=0; });
+  Object.keys(_msel).forEach(id => clearMsSel(id));
   af();
 }
 
@@ -1374,8 +1413,8 @@ function renderStatsPage() {
 }
 
 // ── URL state ──
-const URL_KEYS = ['q','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','fwmax','sb','sd'];
-const ELEM_IDS = ['qs','ftype','frating','factype','fform','fview','fblocked','ftag','fscene','fname','fpmin','fpmax','fwmin','fwmax','sb','sd'];
+const URL_KEYS = ['q','ftag','fscene','fname','fpmin','fpmax','fwmin','fwmax','sb','sd'];
+const ELEM_IDS = ['qs','ftag','fscene','fname','fpmin','fpmax','fwmin','fwmax','sb','sd'];
 
 function saveURLState() {
   const p = new URLSearchParams();
