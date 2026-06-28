@@ -1,17 +1,16 @@
 export default async function handler(req, res) {
   const { gid } = req.query;
-  const SHEET_ID = '1y_aLrrbqDBjZ9mDht1jBZN-sXGqq44Yxv3JDREhgdnA';
+  const scriptUrl = process.env.APPS_SCRIPT_URL;
 
-  const ALLOWED_GIDS = ['0']; // Add your sheet tab gids here
-  if (!ALLOWED_GIDS.includes(gid)) {
-    return res.status(400).json({ error: 'Unknown sheet' });
+  if (!scriptUrl) {
+    return res.status(500).json({ error: 'APPS_SCRIPT_URL environment variable is not set' });
   }
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Cache-Control', 's-maxage=300');
 
   try {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${gid}`;
+    const url = `${scriptUrl}${gid ? `?gid=${encodeURIComponent(gid)}` : ''}`;
 
     const response = await fetch(url, {
       redirect: 'follow',
@@ -19,18 +18,18 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      return res.status(502).json({
-        error: `Google returned ${response.status}`,
-        status: response.status,
-        url,
-      });
+      return res.status(502).json({ error: `Apps Script returned ${response.status}` });
     }
 
     const text = await response.text();
 
+    if (text.trim().startsWith('{') && text.includes('"error"')) {
+      return res.status(502).json({ error: 'Apps Script error', detail: text.slice(0, 300) });
+    }
+
     if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
       return res.status(502).json({
-        error: 'Google returned HTML instead of CSV — sheet may not be public',
+        error: 'Apps Script returned HTML — check it is deployed and the URL is correct',
         preview: text.slice(0, 200),
       });
     }
@@ -38,6 +37,6 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
     return res.send(text);
   } catch (e) {
-    return res.status(500).json({ error: e.message, stack: e.stack });
+    return res.status(500).json({ error: e.message });
   }
 }
