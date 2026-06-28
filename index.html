@@ -698,7 +698,7 @@ function cardHTML(m, idx) {
   const linkBtn  = m.titleUrl
     ? `<a class="card-link-btn" href="${esc(m.titleUrl)}" target="_blank" rel="noopener" title="Open link" onclick="event.stopPropagation()">↗</a>`
     : '';
-  const camBtn = `<button class="card-cam-btn" onclick="event.stopPropagation();openImgModal(${JSON.stringify(key)})" title="Set image">⊕</button>`;
+  const camBtn = `<button class="card-cam-btn" data-imgkey="${esc(key)}" onclick="event.stopPropagation();openImgModal(this.dataset.imgkey)" title="Set image">⊕</button>`;
   const footerParts = [];
   if (m.watch)  footerParts.push(m.watch + ' watch' + (m.watch !== 1 ? 'es' : ''));
   if (m.date)   footerParts.push(m.date);
@@ -711,9 +711,9 @@ function cardHTML(m, idx) {
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
       ${m.rating ? `<span style="color:${sc};font-size:13px;letter-spacing:1px">${stars(m.rating)}</span>` : ''}
       <div style="display:flex;align-items:center;gap:4px">
+        ${camBtn}
         ${m.type ? `<span class="card-type-pill">${esc(m.type)}</span>` : ''}
         ${linkBtn}
-        ${camBtn}
       </div>
     </div>
   </div>
