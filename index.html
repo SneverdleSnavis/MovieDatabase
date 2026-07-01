@@ -138,6 +138,8 @@ canvas{width:100%!important;display:block}
 .actor-stat{font-size:11px;color:#7a8c60;line-height:1.7}
 .actor-stat b{color:#3a4a28;font-weight:600}
 .actor-stars{font-size:13px;color:#8a9e60;letter-spacing:1px}
+.rank-badge{display:inline-block;font-size:10px;font-weight:700;color:#fff;padding:2px 7px;border-radius:5px;margin:0 4px 4px 0;letter-spacing:.02em}
+.actor-badges{margin:2px 0 6px}
 
 /* Stats page */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px;padding:20px 28px}
@@ -634,6 +636,35 @@ function starsColor(rc) {
 
 // ── Rating class ──
 function rClass(r) { return r >= 1 && r <= 5 ? 'r' + r : 'r0'; }
+
+// ── Actor rank-badge colors ──
+function modeOf(arr) {
+  const counts = {};
+  let best = '', bestCount = 0;
+  arr.forEach(v => { if (!v) return; counts[v] = (counts[v]||0)+1; if (counts[v] > bestCount) { bestCount = counts[v]; best = v; } });
+  return best;
+}
+function frontColor(v) {
+  const m = /^(XL|L|M|S)([0-9])$/i.exec(String(v||'').trim());
+  if (!m) return null;
+  const cat = m[1].toUpperCase(), num = m[2];
+  if (cat === 'L' && num === '5') return '#a68a1f';
+  if (cat === 'M' && num === '5') return '#d9b93c';
+  const dark = num === '3';
+  if (cat === 'L')  return dark ? '#3f6b1f' : '#6fa83c';
+  if (cat === 'M')  return dark ? '#2a4f96' : '#4a7fd6';
+  if (cat === 'S')  return dark ? '#96362c' : '#d15c53';
+  if (cat === 'XL') return dark ? '#6a3fa0' : '#9b6bd6';
+  return null;
+}
+const SCALE_COLORS = { '1': '#d15c53', '4': '#4a7fd6', '8': '#6fa83c', '10': '#d9b93c' };
+function scaleColor(v) { return SCALE_COLORS[String(v||'').trim()] || null; }
+const FACE_COLORS = { '0.75': '#d15c53', '1': '#4a7fd6', '1.25': '#6fa83c', '1.5': '#d9b93c' };
+function faceColor(v) { return FACE_COLORS[String(v||'').trim()] || null; }
+function rankBadge(label, val, color) {
+  if (!val) return '';
+  return `<span class="rank-badge" style="background:${color || '#8a9e60'}" title="${esc(label)}">${esc(val)}</span>`;
+}
 
 // ── Escape HTML ──
 function esc(s) {
@@ -1331,6 +1362,21 @@ function renderActorsPage() {
     const avgFSNorm    = normFS(a.movies.reduce((s,m) => s+m.filmScore,0) / a.movies.length);
     const starsStr     = avgRating ? stars(Math.round(avgRating)) : '';
     const aKey         = actorImgKey(a.name);
+
+    const frontMode   = modeOf(a.movies.map(m => m.front));
+    const backMode    = modeOf(a.movies.map(m => m.back));
+    const overallMode = modeOf(a.movies.map(m => m.overall));
+    const faceMode    = modeOf(a.movies.map(m => m.face));
+    const typeMode    = modeOf(a.movies.map(m => m.actorType));
+    const formMode    = modeOf(a.movies.map(m => m.form));
+    const badgesStr = [
+      rankBadge('Front',   frontMode,   frontColor(frontMode)),
+      rankBadge('Back',    backMode,    scaleColor(backMode)),
+      rankBadge('Overall', overallMode, scaleColor(overallMode)),
+      rankBadge('Face',    faceMode,    faceColor(faceMode)),
+    ].join('');
+    const typeFormStr = [typeMode, formMode].filter(Boolean).join(' · ');
+
     return `<div class="actor-card" data-actorname="${esc(a.name)}" onclick="showActorFilms(this.dataset.actorname)">
   <img class="card-img" data-imgkey="${esc(aKey)}" alt="">
   <div style="padding:10px 12px 12px;position:relative">
@@ -1338,7 +1384,9 @@ function renderActorsPage() {
     <div style="font-size:26px;font-weight:700;color:#3a4a28;font-family:Georgia,serif;line-height:1">${avgASNorm}<span style="font-size:12px;font-weight:400">%</span></div>
     <div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#aab890;margin-bottom:6px">actor score</div>
     <div class="actor-name">${esc(a.name)}</div>
+    ${badgesStr ? `<div class="actor-badges">${badgesStr}</div>` : ''}
     <div class="actor-stat"><b>${a.movies.length}</b> film${a.movies.length !== 1 ? 's' : ''} · film score <b>${avgFSNorm}%</b></div>
+    ${typeFormStr ? `<div class="actor-stat">${esc(typeFormStr)}</div>` : ''}
     ${starsStr ? `<div class="actor-stars">${starsStr}</div>` : ''}
   </div>
 </div>`;
