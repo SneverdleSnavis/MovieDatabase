@@ -399,10 +399,12 @@ canvas{width:100%!important;display:block}
     </div>
     <div class="filter-panel" id="actor-filter-panel">
       <div class="filter-grid">
-        <div class="filter-item filter-select"><label>Actor Type</label><select id="af-type"><option value="">All types</option></select></div>
-        <div class="filter-item filter-select"><label>Form</label><select id="af-form"><option value="">All forms</option></select></div>
-        <div class="filter-item filter-select"><label>View</label><select id="af-view"><option value="">All views</option></select></div>
-        <div class="filter-item filter-select"><label>Blocked</label><select id="af-blocked"><option value="">Any</option></select></div>
+        <div class="filter-item filter-select"><label>Actor Type</label><div class="ms-sel" data-msid="atype"><button class="ms-sel-btn" onclick="toggleMsSel(event,'atype')"><span id="ms-lbl-atype">All types</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-atype" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Form</label><div class="ms-sel" data-msid="aform"><button class="ms-sel-btn" onclick="toggleMsSel(event,'aform')"><span id="ms-lbl-aform">All forms</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-aform" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Front</label><div class="ms-sel" data-msid="afront"><button class="ms-sel-btn" onclick="toggleMsSel(event,'afront')"><span id="ms-lbl-afront">All fronts</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-afront" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Back</label><div class="ms-sel" data-msid="aback"><button class="ms-sel-btn" onclick="toggleMsSel(event,'aback')"><span id="ms-lbl-aback">All backs</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-aback" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Overall</label><div class="ms-sel" data-msid="aoverall"><button class="ms-sel-btn" onclick="toggleMsSel(event,'aoverall')"><span id="ms-lbl-aoverall">All overalls</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-aoverall" onclick="event.stopPropagation()"></div></div></div>
+        <div class="filter-item filter-select"><label>Face</label><div class="ms-sel" data-msid="aface"><button class="ms-sel-btn" onclick="toggleMsSel(event,'aface')"><span id="ms-lbl-aface">All faces</span><span class="ms-sel-arrow">▾</span></button><div class="ms-sel-panel" id="ms-panel-aface" onclick="event.stopPropagation()"></div></div></div>
         <div class="filter-item"><label>Min Actor Score %</label><input type="number" id="af-asmin" class="filter-num" placeholder="0" min="0" max="100"/></div>
         <div class="filter-item"><label>Max Actor Score %</label><input type="number" id="af-asmax" class="filter-num" placeholder="" min="0" max="100"/></div>
         <div class="filter-item"><label>Min Films</label><input type="number" id="af-films" class="filter-num" placeholder="1" min="1"/></div>
@@ -515,8 +517,10 @@ let _actors = [];
 let _currentPage = 'list';
 let _imgCache = null;
 let _currentImgKey = null;
-const _msel = { ftype: new Set(), frating: new Set(), factype: new Set(), fform: new Set(), fview: new Set(), fblocked: new Set() };
-const _mselDefault = { ftype:'All types', frating:'All ratings', factype:'All actor types', fform:'All forms', fview:'All views', fblocked:'Any' };
+const _msel = { ftype: new Set(), frating: new Set(), factype: new Set(), fform: new Set(), fview: new Set(), fblocked: new Set(), atype: new Set(), aform: new Set(), afront: new Set(), aback: new Set(), aoverall: new Set(), aface: new Set() };
+const _mselDefault = { ftype:'All types', frating:'All ratings', factype:'All actor types', fform:'All forms', fview:'All views', fblocked:'Any', atype:'All types', aform:'All forms', afront:'All fronts', aback:'All backs', aoverall:'All overalls', aface:'All faces' };
+const _amselKeys = ['atype','aform','afront','aback','aoverall','aface'];
+const _cmselKeys = ['ftype','frating','factype','fform','fview','fblocked'];
 
 // ── Theme ──
 function toggleTheme() {
@@ -686,7 +690,7 @@ function toggleMsOpt(id, val, checked) {
   const btn = lbl?.closest('.ms-sel-btn');
   if (lbl) lbl.textContent = s.size === 0 ? _mselDefault[id] : s.size === 1 ? [...s][0] : s.size + ' selected';
   if (btn) btn.classList.toggle('has-val', s.size > 0);
-  af();
+  if (_amselKeys.includes(id)) renderActorsPage(); else af();
 }
 function clearMsSel(id) {
   _msel[id].clear();
@@ -700,14 +704,14 @@ document.addEventListener('click', () => {
 });
 
 // ── Populate filter dropdowns ──
+function fillMs(id, vals) {
+  const panel = document.getElementById('ms-panel-' + id);
+  if (!panel) return;
+  panel.innerHTML = vals.map(({val, lbl}) =>
+    `<label class="ms-sel-opt"><input type="checkbox" onchange="toggleMsOpt('${id}','${val.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}',this.checked)"> ${lbl}</label>`
+  ).join('');
+}
 function populateFilters() {
-  function fillMs(id, vals) {
-    const panel = document.getElementById('ms-panel-' + id);
-    if (!panel) return;
-    panel.innerHTML = vals.map(({val, lbl}) =>
-      `<label class="ms-sel-opt"><input type="checkbox" onchange="toggleMsOpt('${id}','${val.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}',this.checked)"> ${lbl}</label>`
-    ).join('');
-  }
   const opts = arr => arr.map(v => ({val:v, lbl:v}));
   fillMs('ftype',   opts([...new Set(D.map(m => m.type).filter(Boolean))].sort()));
   fillMs('frating', [{val:'5',lbl:'★★★★★ (5)'},{val:'4',lbl:'★★★★☆ (4)'},{val:'3',lbl:'★★★☆☆ (3)'},{val:'2',lbl:'★★☆☆☆ (2)'},{val:'1',lbl:'★☆☆☆☆ (1)'}]);
@@ -718,16 +722,14 @@ function populateFilters() {
 }
 
 function populateActorFilters() {
-  function fill(id, opts, first) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.innerHTML = `<option value="">${first}</option>`;
-    opts.forEach(v => { const o = document.createElement('option'); o.value = v; o.textContent = v; el.appendChild(o); });
-  }
-  fill('af-type',    [...new Set(D.map(m => m.actorType).filter(Boolean))].sort(), 'All types');
-  fill('af-form',    [...new Set(D.map(m => m.form).filter(Boolean))].sort(),      'All forms');
-  fill('af-view',    [...new Set(D.map(m => m.view).filter(Boolean))].sort(),      'All views');
-  fill('af-blocked', [...new Set(D.map(m => m.blocked).filter(Boolean))].sort(),   'Any');
+  const opts = arr => arr.map(v => ({val:v, lbl:v}));
+  const numSort = arr => arr.sort((a,b) => parseFloat(a) - parseFloat(b));
+  fillMs('atype',    opts([...new Set(D.map(m => m.actorType).filter(Boolean))].sort()));
+  fillMs('aform',    opts([...new Set(D.map(m => m.form).filter(Boolean))].sort()));
+  fillMs('afront',   opts([...new Set(D.map(m => m.front).filter(Boolean))].sort()));
+  fillMs('aback',    opts(numSort([...new Set(D.map(m => m.back).filter(Boolean))])));
+  fillMs('aoverall', opts(numSort([...new Set(D.map(m => m.overall).filter(Boolean))])));
+  fillMs('aface',    opts(numSort([...new Set(D.map(m => m.face).filter(Boolean))])));
 }
 
 function toggleActorFilterPanel() {
@@ -738,7 +740,7 @@ function toggleActorFilterPanel() {
 
 function resetActorFilters() {
   ['actor-qs','af-asmin','af-asmax','af-films'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  ['af-type','af-form','af-view','af-blocked'].forEach(id => { const el=document.getElementById(id); if(el) el.selectedIndex=0; });
+  _amselKeys.forEach(id => clearMsSel(id));
   renderActorsPage();
 }
 
@@ -1229,7 +1231,7 @@ function toggleFilterPanel() {
 
 function resetFilters() {
   ['qs','ftag','fscene','fname','fpmin','fpmax','fwmin','fwmax'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
-  Object.keys(_msel).forEach(id => clearMsSel(id));
+  _cmselKeys.forEach(id => clearMsSel(id));
   af();
 }
 
@@ -1305,29 +1307,28 @@ function buildActors() {
 function renderActorsPage() {
   const q         = (document.getElementById('actor-qs').value || '').toLowerCase();
   const sb        = document.getElementById('actor-sb').value;
-  const aftype    = document.getElementById('af-type')?.value    || '';
-  const afform    = document.getElementById('af-form')?.value    || '';
-  const afview    = document.getElementById('af-view')?.value    || '';
-  const afblocked = document.getElementById('af-blocked')?.value || '';
   const afasmin   = parseInt(document.getElementById('af-asmin')?.value) || 0;
   const afasmax   = parseInt(document.getElementById('af-asmax')?.value) || 0;
   const affilms   = parseInt(document.getElementById('af-films')?.value) || 0;
 
-  const hasFilters = aftype||afform||afview||afblocked||afasmin||afasmax||affilms;
+  const hasMsel = _amselKeys.some(id => _msel[id].size > 0);
+  const hasFilters = hasMsel||afasmin||afasmax||affilms;
   if (document.getElementById('actor-filter-btn')) {
     document.getElementById('actor-filter-btn').classList.toggle('has-filters', !!hasFilters);
     document.getElementById('actor-reset-btn').classList.toggle('active', !!(hasFilters || q));
   }
 
   let actors = _actors.filter(a => {
-    if (q         && !a.name.toLowerCase().includes(q))                         return false;
-    if (aftype    && !a.movies.some(m => m.actorType === aftype))               return false;
-    if (afform    && !a.movies.some(m => m.form    === afform))                 return false;
-    if (afview    && !a.movies.some(m => m.view    === afview))                 return false;
-    if (afblocked && !a.movies.some(m => m.blocked === afblocked))              return false;
-    if (afasmin   && normAS(avgAS(a)) < afasmin)                                return false;
-    if (afasmax   && normAS(avgAS(a)) > afasmax)                                return false;
-    if (affilms   && a.movies.length  < affilms)                                return false;
+    if (q                  && !a.name.toLowerCase().includes(q))                          return false;
+    if (_msel.atype.size    && !a.movies.some(m => _msel.atype.has(m.actorType)))         return false;
+    if (_msel.aform.size    && !a.movies.some(m => _msel.aform.has(m.form)))              return false;
+    if (_msel.afront.size   && !a.movies.some(m => _msel.afront.has(m.front)))            return false;
+    if (_msel.aback.size    && !a.movies.some(m => _msel.aback.has(m.back)))              return false;
+    if (_msel.aoverall.size && !a.movies.some(m => _msel.aoverall.has(m.overall)))        return false;
+    if (_msel.aface.size    && !a.movies.some(m => _msel.aface.has(m.face)))              return false;
+    if (afasmin   && normAS(avgAS(a)) < afasmin)                                          return false;
+    if (afasmax   && normAS(avgAS(a)) > afasmax)                                          return false;
+    if (affilms   && a.movies.length  < affilms)                                          return false;
     return true;
   });
 
@@ -1481,7 +1482,7 @@ ELEM_IDS.forEach(id => {
   const el = document.getElementById(id);
   if (el) { el.addEventListener('input', af); el.addEventListener('change', af); }
 });
-['actor-qs','actor-sb','af-type','af-form','af-view','af-blocked','af-asmin','af-asmax','af-films'].forEach(id => {
+['actor-qs','actor-sb','af-asmin','af-asmax','af-films'].forEach(id => {
   const el = document.getElementById(id);
   if (el) { el.addEventListener('input', renderActorsPage); el.addEventListener('change', renderActorsPage); }
 });
